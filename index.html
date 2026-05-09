@@ -498,4 +498,65 @@ function renderTransactions(){
 function updateSummary(){
   document.getElementById('sales').textContent = '₱'+sales.toFixed(2);
   document.getElementById('expenses').textContent = '₱'+expenses.toFixed(2);
-  document.getElement
+  document.getElementById('itemsSold').textContent = itemsSold+' pcs';
+  document.getElementById('net').textContent = '₱'+(sales-expenses).toFixed(2);
+}
+
+function resetDay(){
+  if(!confirm('Reset all data for today? This will clear Sales, Expenses, and all logs.'))return;
+  sales = 0;
+  expenses = 0;
+  itemsSold = 0;
+  cart = [];
+  productionLogs = [];
+  transactions = [];
+  expensesList = [];
+  for(var i=0;i<products.length;i++){
+    products[i].stock = 100;
+  }
+  saveData();
+  renderCategories();
+  renderPOSCategories();
+  renderCart();
+  renderProductionLogs();
+  renderTransactions();
+  renderExpenses();
+  updateSummary();
+  alert('Day reset complete! All data cleared. Stock reset to 100 pcs each.');
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('active');
+}
+
+// AUTO RUN - V3.17 FIX: Force update products array
+var savedVersion = localStorage.getItem('version');
+var savedProducts = localStorage.getItem('products');
+
+if(savedVersion!== 'V3.17'){
+  localStorage.setItem('products',JSON.stringify(products));
+  localStorage.setItem('version','V3.17');
+}else{
+  if(savedProducts) products = JSON.parse(savedProducts);
+}
+
+var savedLogs = localStorage.getItem('productionLogs');
+if(savedLogs) productionLogs = JSON.parse(savedLogs);
+var savedTrans = localStorage.getItem('transactions');
+if(savedTrans) transactions = JSON.parse(savedTrans);
+var savedExp = localStorage.getItem('expensesList');
+if(savedExp) expensesList = JSON.parse(savedExp);
+sales = parseFloat(localStorage.getItem('sales'))||0;
+expenses = parseFloat(localStorage.getItem('expenses'))||0;
+itemsSold = parseInt(localStorage.getItem('itemsSold'))||0;
+
+renderCategories();
+renderPOSCategories();
+renderProductionLogs();
+renderTransactions();
+renderExpenses();
+updateSummary();
+</script>
+
+</body>
+</html>
