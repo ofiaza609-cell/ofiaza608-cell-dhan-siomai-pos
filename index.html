@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>One SIOMAi POS V3.9</title>
+<title>One SIOMAi POS V3.10</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--primary:#FF6B35;--dark:#2C3E50;--light:#ECF0F1;--green:#27AE60;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6}
@@ -71,7 +71,7 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 <body>
 
 <div class="header">
-  <h1>🥟 One SIOMAi POS V3.9</h1>
+  <h1>🥟 One SIOMAi POS V3.10</h1>
 </div>
 
 <div class="summary">
@@ -186,23 +186,27 @@ var products = [
   {id:10,name:'Shrimp 30\'s',cat:'30\'s',stock:100,price:85},
 
   // BIG SIOMAI
-  {id:11,name:'Pork Big Siomai',cat:'BIG SIOMAI',stock:50,price:25},
-  {id:12,name:'Chicken Big Siomai',cat:'BIG SIOMAI',stock:50,price:25},
-  {id:13,name:'Beef Big Siomai',cat:'BIG SIOMAI',stock:50,price:25},
+  {id:11,name:'Pork Big Siomai',cat:'BIG SIOMAI',stock:100,price:120},
+  {id:12,name:'Chicken Big Siomai',cat:'BIG SIOMAI',stock:100,price:120},
+  {id:13,name:'Beef Big Siomai',cat:'BIG SIOMAI',stock:100,price:120},
+  {id:14,name:'Japanese Big Siomai',cat:'BIG SIOMAI',stock:100,price:150},
 
   // DUMPLINGS
-  {id:14,name:'Pork Dumplings',cat:'DUMPLINGS',stock:50,price:20},
-  {id:15,name:'Shrimp Dumplings',cat:'DUMPLINGS',stock:50,price:25},
-  {id:16,name:'Sharksfin Dumplings',cat:'DUMPLINGS',stock:50,price:25},
+  {id:15,name:'Sharksfin',cat:'DUMPLINGS',stock:100,price:110},
+  {id:16,name:'Gyoza',cat:'DUMPLINGS',stock:100,price:110},
+  {id:17,name:'Hakaw',cat:'DUMPLINGS',stock:100,price:280},
 
   // SIOPAO
-  {id:17,name:'Asado Siopao',cat:'SIOPAO',stock:50,price:30},
-  {id:18,name:'Bola-Bola Siopao',cat:'SIOPAO',stock:50,price:30},
+  {id:18,name:'Jumbo Asado',cat:'SIOPAO',stock:100,price:200},
+  {id:19,name:'MINI SIOPAO',cat:'SIOPAO',stock:100,price:200},
+  {id:20,name:'Mini Bola Bola',cat:'SIOPAO',stock:100,price:209},
+  {id:21,name:'Mini ASADO',cat:'SIOPAO',stock:100,price:200},
 
   // SAUCE
-  {id:19,name:'Chili Garlic Sauce',cat:'SAUCE',stock:100,price:15},
-  {id:20,name:'Toyomansi',cat:'SAUCE',stock:100,price:10},
-  {id:21,name:'Calamansi',cat:'SAUCE',stock:100,price:5}
+  {id:22,name:'Chili Garlic Sauce',cat:'SAUCE',stock:100,price:15},
+  {id:23,name:'Toyomansi',cat:'SAUCE',stock:100,price:10},
+  {id:24,name:'Calamansi',cat:'SAUCE',stock:100,price:5},
+  {id:25,name:'Sweet Chili Sauce',cat:'SAUCE',stock:100,price:15}
 ];
 
 var sales = 0;
@@ -488,7 +492,7 @@ function updateSummary(){
 }
 
 function resetDay(){
-  if(!confirm('Reset all data for today?'))return;
+  if(!confirm('Reset all data for today? This will clear Sales, Expenses, and all logs.'))return;
   sales = 0;
   expenses = 0;
   itemsSold = 0;
@@ -504,7 +508,7 @@ function resetDay(){
   renderTransactions();
   renderExpenses();
   updateSummary();
-  alert('Day reset complete!');
+  alert('Day reset complete! All data cleared.');
 }
 
 function closeModal(id){
