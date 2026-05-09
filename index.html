@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>One SIOMAi POS V3.15</title>
+<title>One SIOMAi POS V3.16</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--primary:#FF6B35;--dark:#2C3E50;--light:#ECF0F1;--green:#27AE60;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6}
@@ -72,7 +72,7 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 <body>
 
 <div class="header">
-  <h1>🥟 One SIOMAi POS V3.15</h1>
+  <h1>🥟 One SIOMAi POS V3.16</h1>
 </div>
 
 <div class="summary">
@@ -171,15 +171,16 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 </div>
 
 <script>
+// V3.16: FORCE UPDATE - Hindi na mabubura ng luma
 var products = [
-  // 65's - KUMPLETO NA BOSS
+  // 65's - COMPLETE 5 FLAVORS
   {id:1,name:'Pork 65\'s',cat:'65\'s',stock:100,price:160},
   {id:2,name:'Chicken 65\'s',cat:'65\'s',stock:100,price:150},
   {id:3,name:'Beef 65\'s',cat:'65\'s',stock:100,price:150},
   {id:4,name:'Japanese 65\'s',cat:'65\'s',stock:100,price:160},
   {id:5,name:'Shrimp 65\'s',cat:'65\'s',stock:100,price:170},
 
-  // 30's - KUMPLETO NA BOSS
+  // 30's - COMPLETE 5 FLAVORS
   {id:6,name:'Pork 30\'s',cat:'30\'s',stock:100,price:80},
   {id:7,name:'Chicken 30\'s',cat:'30\'s',stock:100,price:80},
   {id:8,name:'Beef 30\'s',cat:'30\'s',stock:100,price:80},
@@ -222,6 +223,7 @@ var currentCartId = 0;
 var currentProdId = 0;
 
 function saveData(){
+  // V3.16: Save products every time para hindi ma-overwrite
   localStorage.setItem('products',JSON.stringify(products));
   localStorage.setItem('productionLogs',JSON.stringify(productionLogs));
   localStorage.setItem('transactions',JSON.stringify(transactions));
@@ -229,6 +231,7 @@ function saveData(){
   localStorage.setItem('sales',sales);
   localStorage.setItem('expenses',expenses);
   localStorage.setItem('itemsSold',itemsSold);
+  localStorage.setItem('version','V3.16'); // Mark version
 }
 
 function toggleMainFolder(type){
@@ -520,6 +523,10 @@ function resetDay(){
   productionLogs = [];
   transactions = [];
   expensesList = [];
+  // V3.16: Reset stocks to 100 para may pang-test ka
+  for(var i=0;i<products.length;i++){
+    products[i].stock = 100;
+  }
   saveData();
   renderCategories();
   renderPOSCategories();
@@ -528,16 +535,25 @@ function resetDay(){
   renderTransactions();
   renderExpenses();
   updateSummary();
-  alert('Day reset complete! All data cleared.');
+  alert('Day reset complete! All data cleared. Stock reset to 100 pcs each.');
 }
 
 function closeModal(id){
   document.getElementById(id).classList.remove('active');
 }
 
-// AUTO RUN
+// AUTO RUN - V3.16 FIX: Force update products array
+var savedVersion = localStorage.getItem('version');
 var savedProducts = localStorage.getItem('products');
-if(savedProducts) products = JSON.parse(savedProducts);
+
+// Kung luma yung version o wala, i-overwrite ko yung products
+if(savedVersion!== 'V3.16'){
+  localStorage.setItem('products',JSON.stringify(products));
+  localStorage.setItem('version','V3.16');
+}else{
+  if(savedProducts) products = JSON.parse(savedProducts);
+}
+
 var savedLogs = localStorage.getItem('productionLogs');
 if(savedLogs) productionLogs = JSON.parse(savedLogs);
 var savedTrans = localStorage.getItem('transactions');
