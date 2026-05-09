@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>One SIOMAi POS V3.17</title>
+<title>One SIOMAi POS V3.18</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--primary:#FF6B35;--dark:#2C3E50;--light:#ECF0F1;--green:#27AE60;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6}
@@ -31,12 +31,6 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
-/* INALIS KO NA TO - ITO YUNG SALARIN KAYA HINDI MAPINDOT */
-/*.folder *{
-  pointer-events:none;
-  user-select:none;
-  -webkit-user-select:none;
-} */
 .folder-content{display:none;padding:10px}
 .folder-content.active{display:block}
 .sub-folder{margin-bottom:10px;border:1px solid #ddd;border-radius:8px;overflow:hidden}
@@ -68,15 +62,26 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 .log-item,.trans-item,.exp-item{padding:10px;background:#f9f9f9;margin-bottom:8px;border-radius:5px;font-size:13px}
 .log-time,.trans-time,.exp-time{font-size:11px;color:#7f8c8d}
 .empty{padding:20px;text-align:center;color:#7f8c8d;font-size:13px}
+.receipt{font-family:'Courier New',monospace;font-size:12px;line-height:1.4}
+.receipt h4{text-align:center;margin:10px 0}
+.receipt-line{display:flex;justify-content:space-between;margin:2px 0}
+.receipt-divider{border-top:1px dashed #000;margin:8px 0}
+.receipt-total{font-weight:bold}
+@media print{
+  body *{visibility:hidden}
+  .receipt-print,.receipt-print *{visibility:visible}
+  .receipt-print{position:absolute;left:0;top:0;width:100%}
+  .no-print{display:none}
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🥟 One SIOMAi POS V3.17</h1>
+<div class="header no-print">
+  <h1>🥟 One SIOMAi POS V3.18</h1>
 </div>
 
-<div class="summary">
+<div class="summary no-print">
   <div class="summary-row"><span>Sales:</span><span id="sales">₱0.00</span></div>
   <div class="summary-row"><span>Expenses:</span><span id="expenses">₱0.00</span></div>
   <div class="summary-row"><span>Items Sold:</span><span id="itemsSold">0 pcs</span></div>
@@ -88,32 +93,32 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   </div>
 </div>
 
-<div class="folder" onclick="toggleMainFolder('POS')">
+<div class="folder no-print" onclick="toggleMainFolder('POS')">
   <span>🛒 POS / BENTA</span><span id="arrowPOS">▶</span>
 </div>
-<div class="folder-content" id="contentPOS"></div>
+<div class="folder-content no-print" id="contentPOS"></div>
 
-<div class="folder" onclick="toggleMainFolder('PRODUCTION')">
+<div class="folder no-print" onclick="toggleMainFolder('PRODUCTION')">
   <span>📦 DAILY PRODUCTION</span><span id="arrowPRODUCTION">▶</span>
 </div>
-<div class="folder-content" id="contentPRODUCTION"></div>
+<div class="folder-content no-print" id="contentPRODUCTION"></div>
 
-<div class="main-folder">
+<div class="main-folder no-print">
   <div class="sub-folder-header" onclick="toggleSubFolder(this)">💸 Today's Expenses</div>
   <div class="sub-folder-content" id="expensesList"></div>
 </div>
 
-<div class="main-folder">
+<div class="main-folder no-print">
   <div class="sub-folder-header" onclick="toggleSubFolder(this)">📋 Today's Production Logs</div>
   <div class="sub-folder-content" id="productionLogs"></div>
 </div>
 
-<div class="main-folder">
+<div class="main-folder no-print">
   <div class="sub-folder-header" onclick="toggleSubFolder(this)">📋 Today's Transactions</div>
   <div class="sub-folder-content" id="transactionsList"></div>
 </div>
 
-<div class="cart" id="cart" style="display:none">
+<div class="cart no-print" id="cart" style="display:none">
   <div class="cart-header">
     <span>🛒 Cart</span>
     <button class="btn" onclick="clearCart()" style="background:var(--red);color:#fff;padding:5px 10px">Clear</button>
@@ -124,6 +129,31 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
     <span id="cartTotal">₱0.00</span>
   </div>
   <button class="btn btn-primary" onclick="checkout()">💰 CHECKOUT</button>
+</div>
+
+<!-- CASH PAYMENT MODAL -->
+<div class="modal" id="cashModal">
+  <div class="modal-content">
+    <h3>💵 Payment</h3>
+    <div style="font-size:18px;font-weight:700;margin-bottom:10px">Total: <span id="cashTotal">₱0.00</span></div>
+    <input type="number" id="cashReceived" placeholder="Cash Received ₱" min="0" oninput="calcChange()">
+    <div style="font-size:16px;font-weight:700;margin:10px 0">Change: <span id="cashChange">₱0.00</span></div>
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="closeModal('cashModal')">Cancel</button>
+      <button class="btn-confirm" onclick="confirmPayment()">Pay & Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="modal" id="receiptModal">
+  <div class="modal-content receipt-print">
+    <div class="receipt" id="receiptContent"></div>
+    <div class="modal-buttons no-print">
+      <button class="btn-cancel" onclick="closeModal('receiptModal')">Close</button>
+      <button class="btn-confirm" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="addCartModal">
@@ -210,6 +240,9 @@ var transactions = [];
 var expensesList = [];
 var currentCartId = 0;
 var currentProdId = 0;
+var currentCheckoutTotal = 0;
+var currentCash = 0;
+var currentChange = 0;
 
 function saveData(){
   localStorage.setItem('products',JSON.stringify(products));
@@ -219,7 +252,7 @@ function saveData(){
   localStorage.setItem('sales',sales);
   localStorage.setItem('expenses',expenses);
   localStorage.setItem('itemsSold',itemsSold);
-  localStorage.setItem('version','V3.17');
+  localStorage.setItem('version','V3.18');
 }
 
 function toggleMainFolder(type){
@@ -227,336 +260,4 @@ function toggleMainFolder(type){
   var arrow = document.getElementById('arrow'+type);
   var isActive = content.classList.contains('active');
 
-  document.getElementById('contentPOS').classList.remove('active');
-  document.getElementById('contentPRODUCTION').classList.remove('active');
-  document.getElementById('arrowPOS').textContent = '▶';
-  document.getElementById('arrowPRODUCTION').textContent = '▶';
-
-  if(!isActive){
-    content.classList.add('active');
-    arrow.textContent = '▼';
-  }
-}
-
-function toggleSubFolder(el){
-  var content = el.nextElementSibling;
-  var parent = el.parentElement.parentElement;
-  var allSubContents = parent.querySelectorAll('.sub-folder-content');
-  var allHeaders = parent.querySelectorAll('.sub-folder-header span');
-
-  var isActive = content.classList.contains('active');
-
-  for(var i=0;i<allSubContents.length;i++){
-    allSubContents[i].classList.remove('active');
-  }
-  for(var i=0;i<allHeaders.length;i++){
-    allHeaders[i].textContent = '▼';
-  }
-
-  if(!isActive){
-    content.classList.add('active');
-    el.querySelector('span').textContent = '▲';
-  }
-}
-
-function renderCategories(){
-  var cats = ['65\'s','30\'s','BIG SIOMAI','DUMPLINGS','SIOPAO','SAUCE'];
-  var html = '';
-  for(var i=0;i<cats.length;i++){
-    var cat = cats[i];
-    var catProducts = products.filter(p=>p.cat===cat);
-    if(catProducts.length===0) continue;
-
-    html += '<div class="sub-folder"><div class="sub-folder-header" onclick="toggleSubFolder(this)">'+cat+' <span>▼</span></div><div class="sub-folder-content">';
-    for(var j=0;j<catProducts.length;j++){
-      var p = catProducts[j];
-      html += '<div class="product"><div class="product-info"><div class="product-name">'+p.name+'</div><div class="product-stock">Stock: '+p.stock+' pcs</div></div><div class="product-price">₱'+p.price+'</div><button class="btn btn-add" onclick="addProduction('+p.id+')">➕ Add</button></div>';
-    }
-    html += '</div></div>';
-  }
-  document.getElementById('contentPRODUCTION').innerHTML = html;
-}
-
-function renderPOSCategories(){
-  var cats = ['65\'s','30\'s','BIG SIOMAI','DUMPLINGS','SIOPAO','SAUCE'];
-  var html = '';
-  for(var i=0;i<cats.length;i++){
-    var cat = cats[i];
-    var catProducts = products.filter(p=>p.cat===cat);
-    if(catProducts.length===0) continue;
-
-    html += '<div class="sub-folder"><div class="sub-folder-header" onclick="toggleSubFolder(this)">'+cat+' <span>▼</span></div><div class="sub-folder-content">';
-    for(var j=0;j<catProducts.length;j++){
-      var p = catProducts[j];
-      html += '<div class="product"><div class="product-info"><div class="product-name">'+p.name+'</div><div class="product-stock">Stock: '+p.stock+' pcs</div></div><div class="product-price">₱'+p.price+'</div><button class="btn btn-add" onclick="addToCart('+p.id+')">🛒 Add</button></div>';
-    }
-    html += '</div></div>';
-  }
-  document.getElementById('contentPOS').innerHTML = html;
-}
-
-function addProduction(id){
-  currentProdId = id;
-  var p = products.find(x=>x.id===id);
-  document.getElementById('modalProdName').textContent = 'Add Production: '+p.name;
-  document.getElementById('prodQty').value = '';
-  document.getElementById('addProductionModal').classList.add('active');
-}
-
-function confirmAddProduction(){
-  var qty = parseInt(document.getElementById('prodQty').value)||0;
-  if(qty<=0){alert('Enter valid quantity!');return}
-  var p = products.find(x=>x.id===currentProdId);
-  p.stock += qty;
-  productionLogs.unshift({id:Date.now(),name:p.name,qty:qty,time:new Date().toLocaleTimeString()});
-  saveData();
-  renderCategories();
-  renderPOSCategories();
-  renderProductionLogs();
-  closeModal('addProductionModal');
-}
-
-function addToCart(id){
-  currentCartId = id;
-  var p = products.find(x=>x.id===id);
-  document.getElementById('modalProductName').textContent = 'Add to Cart: '+p.name;
-  document.getElementById('modalStock').textContent = p.stock;
-  document.getElementById('cartQty').value = '';
-  document.getElementById('addCartModal').classList.add('active');
-}
-
-function confirmAddToCart(){
-  var qty = parseInt(document.getElementById('cartQty').value)||0;
-  var p = products.find(x=>x.id===currentCartId);
-
-  if(qty<=0){alert('Enter valid quantity!');return}
-  if(qty>p.stock){alert('Not enough stock! Only '+p.stock+' pcs available');return}
-
-  var existing = cart.find(x=>x.id===currentCartId);
-  var totalInCart = existing? existing.qty + qty : qty;
-
-  if(totalInCart > p.stock){
-    alert('Cannot add! Total in cart would be '+totalInCart+' but only '+p.stock+' pcs in stock');
-    return;
-  }
-
-  if(existing){
-    existing.qty += qty;
-  }else{
-    cart.push({id:p.id,name:p.name,price:p.price,qty:qty});
-  }
-
-  closeModal('addCartModal');
-  renderCart();
-}
-
-function renderCart(){
-  if(cart.length===0){
-    document.getElementById('cart').style.display='none';
-    return;
-  }
-  document.getElementById('cart').style.display='block';
-  var html = '';
-  var total = 0;
-  for(var i=0;i<cart.length;i++){
-    var item = cart[i];
-    var subtotal = item.price * item.qty;
-    total += subtotal;
-    html += '<div class="cart-item"><span>'+item.name+' x'+item.qty+'</span><span>₱'+subtotal.toFixed(2)+'</span></div>';
-  }
-  document.getElementById('cartItems').innerHTML = html;
-  document.getElementById('cartTotal').textContent = '₱'+total.toFixed(2);
-}
-
-function clearCart(){
-  if(!confirm('Clear cart?'))return;
-  cart = [];
-  renderCart();
-}
-
-function checkout(){
-  if(cart.length===0){alert('Cart is empty!');return}
-
-  var total = 0;
-  var totalItems = 0;
-
-  for(var i=0;i<cart.length;i++){
-    var item = cart[i];
-    var p = products.find(x=>x.id===item.id);
-    if(item.qty > p.stock){
-      alert('Not enough stock for '+p.name+'! Only '+p.stock+' pcs available');
-      return;
-    }
-    total += item.price * item.qty;
-    totalItems += item.qty;
-  }
-
-  if(!confirm('Checkout ₱'+total.toFixed(2)+'?'))return;
-
-  for(var i=0;i<cart.length;i++){
-    var item = cart[i];
-    var p = products.find(x=>x.id===item.id);
-    p.stock -= item.qty;
-  }
-
-  sales += total;
-  itemsSold += totalItems;
-
-  transactions.unshift({
-    id:Date.now(),
-    time:new Date().toLocaleTimeString(),
-    items:JSON.parse(JSON.stringify(cart)),
-    total:total
-  });
-
-  cart = [];
-  saveData();
-
-  renderCategories();
-  renderPOSCategories();
-  renderCart();
-  renderTransactions();
-  updateSummary();
-
-  alert('Checkout successful! ₱'+total.toFixed(2)+' | Stock updated');
-}
-
-function addExpense(){
-  document.getElementById('expAmount').value = '';
-  document.getElementById('expNote').value = '';
-  document.getElementById('addExpenseModal').classList.add('active');
-}
-
-function confirmAddExpense(){
-  var type = document.getElementById('expType').value;
-  var amount = parseFloat(document.getElementById('expAmount').value)||0;
-  var note = document.getElementById('expNote').value;
-
-  if(amount<=0){alert('Enter valid amount!');return}
-
-  expenses += amount;
-  expensesList.unshift({
-    id:Date.now(),
-    type:type,
-    amount:amount,
-    note:note,
-    time:new Date().toLocaleTimeString()
-  });
-
-  saveData();
-  renderExpenses();
-  updateSummary();
-  closeModal('addExpenseModal');
-}
-
-function renderExpenses(){
-  var html = '';
-  if(expensesList.length===0){
-    html = '<div class="empty">No expenses yet</div>';
-  }else{
-    for(var i=0;i<expensesList.length;i++){
-      var exp = expensesList[i];
-      html += '<div class="exp-item"><div><strong>'+exp.type+'</strong>: ₱'+exp.amount.toFixed(2)+'</div>';
-      if(exp.note) html += '<div style="font-size:12px;color:#7f8c8d">'+exp.note+'</div>';
-      html += '<div class="exp-time">'+exp.time+'</div></div>';
-    }
-  }
-  document.getElementById('expensesList').innerHTML = html;
-}
-
-function renderProductionLogs(){
-  var html = '';
-  if(productionLogs.length===0){
-    html = '<div class="empty">No production logs yet</div>';
-  }else{
-    for(var i=0;i<productionLogs.length;i++){
-      var log = productionLogs[i];
-      html += '<div class="log-item"><div><strong>'+log.name+'</strong> +'+log.qty+' pcs</div><div class="log-time">'+log.time+'</div></div>';
-    }
-  }
-  document.getElementById('productionLogs').innerHTML = html;
-}
-
-function renderTransactions(){
-  var html = '';
-  if(transactions.length===0){
-    html = '<div class="empty">No transactions yet</div>';
-  }else{
-    for(var i=0;i<transactions.length;i++){
-      var trans = transactions[i];
-      var items = '';
-      for(var j=0;j<trans.items.length;j++){
-        items += trans.items[j].name+' x'+trans.items[j].qty+', ';
-      }
-      html += '<div class="trans-item"><div><strong>₱'+trans.total.toFixed(2)+'</strong></div><div style="font-size:12px;margin:5px 0">'+items.slice(0,-2)+'</div><div class="trans-time">'+trans.time+'</div></div>';
-    }
-  }
-  document.getElementById('transactionsList').innerHTML = html;
-  document.getElementById('transactions').textContent = transactions.length;
-}
-
-function updateSummary(){
-  document.getElementById('sales').textContent = '₱'+sales.toFixed(2);
-  document.getElementById('expenses').textContent = '₱'+expenses.toFixed(2);
-  document.getElementById('itemsSold').textContent = itemsSold+' pcs';
-  document.getElementById('net').textContent = '₱'+(sales-expenses).toFixed(2);
-}
-
-function resetDay(){
-  if(!confirm('Reset all data for today? This will clear Sales, Expenses, and all logs.'))return;
-  sales = 0;
-  expenses = 0;
-  itemsSold = 0;
-  cart = [];
-  productionLogs = [];
-  transactions = [];
-  expensesList = [];
-  for(var i=0;i<products.length;i++){
-    products[i].stock = 100;
-  }
-  saveData();
-  renderCategories();
-  renderPOSCategories();
-  renderCart();
-  renderProductionLogs();
-  renderTransactions();
-  renderExpenses();
-  updateSummary();
-  alert('Day reset complete! All data cleared. Stock reset to 100 pcs each.');
-}
-
-function closeModal(id){
-  document.getElementById(id).classList.remove('active');
-}
-
-// AUTO RUN - V3.17 FIX: Force update products array
-var savedVersion = localStorage.getItem('version');
-var savedProducts = localStorage.getItem('products');
-
-if(savedVersion!== 'V3.17'){
-  localStorage.setItem('products',JSON.stringify(products));
-  localStorage.setItem('version','V3.17');
-}else{
-  if(savedProducts) products = JSON.parse(savedProducts);
-}
-
-var savedLogs = localStorage.getItem('productionLogs');
-if(savedLogs) productionLogs = JSON.parse(savedLogs);
-var savedTrans = localStorage.getItem('transactions');
-if(savedTrans) transactions = JSON.parse(savedTrans);
-var savedExp = localStorage.getItem('expensesList');
-if(savedExp) expensesList = JSON.parse(savedExp);
-sales = parseFloat(localStorage.getItem('sales'))||0;
-expenses = parseFloat(localStorage.getItem('expenses'))||0;
-itemsSold = parseInt(localStorage.getItem('itemsSold'))||0;
-
-renderCategories();
-renderPOSCategories();
-renderProductionLogs();
-renderTransactions();
-renderExpenses();
-updateSummary();
-</script>
-
-</body>
-</html>
+  document.getElementById('contentPOS').classList.remove
