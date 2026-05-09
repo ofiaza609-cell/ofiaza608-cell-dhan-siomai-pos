@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One SIOMAi POS V3.1</title>
+<title>One SIOMAi POS V3.2</title>
 <meta name="theme-color" content="#FF6B35">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
@@ -16,6 +16,8 @@ body { background: #f5f5f5; padding-bottom: 20px; padding-top: 60px; }
 .card { background: white; margin: 8px; padding: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 .card h3 { font-size: 16px; margin-bottom: 8px; }
 .btn { background: #FF6B35; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 14px; width: 100%; }
+.btn-checkout { background: #4CAF50; font-weight: bold; font-size: 16px; padding: 12px; }
+.btn-clear { background: #f44336; }
 input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin: 3px 0; font-size: 14px; width: 100%; }
 .input-label { font-size: 10px; color: #666; margin-left: 3px; margin-bottom: 5px; }
 
@@ -42,11 +44,18 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 .btn-group { display: flex; gap: 4px; margin-top: 6px; }
 .btn-edit { background: #FF9800; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 11px; flex: 1; }
 .btn-log { background: #4CAF50; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 11px; flex: 1; }
+.btn-add-cart { background: #2196F3; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 11px; flex: 1; }
 
 .log-item { border: 1px solid #eee; padding: 6px; margin: 4px 0; border-radius: 4px; font-size: 11px; background: white; }
 .log-item-name { font-weight: bold; }
 .waste-text { color: #FF9800; font-weight: bold; }
 .wrapper-text { color: #2196F3; font-weight: bold; }
+
+.cart-item { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #eee; font-size: 12px; }
+.cart-item-name { flex: 1; }
+.cart-item-qty { width: 60px; text-align: center; }
+.cart-item-price { width: 70px; text-align: right; font-weight: bold; }
+.cart-total { display: flex; justify-content: space-between; padding: 10px 6px; font-weight: bold; font-size: 14px; border-top: 2px solid #FF6B35; margin-top: 5px; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; }
 .modal-content { background: white; margin: 50px auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; }
@@ -56,18 +65,97 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 </style>
 </head>
 <body>
-<div class="header">🥟 One SIOMAi POS V3.1</div>
+<div class="header">🥟 One SIOMAi POS V3.2</div>
 
 <div class="summary">
 <div class="summary-row"><span>Sales:</span><span>₱<span id="sales">0.00</span></span></div>
 <div class="summary-row"><span>Expenses:</span><span>₱<span id="expenses">0.00</span></span></div>
 <div class="summary-row"><span>Items Sold:</span><span><span id="itemsSold">0</span> pcs</span></div>
+<div class="summary-row"><span>Transactions:</span><span id="transCount">0</span></div>
 <div class="summary-row summary-net"><span>Net:</span><span>₱<span id="net">0.00</span></span></div>
 <button class="btn-small" onclick="resetDay()">Reset Day</button>
 </div>
 
+<!-- POS / BENTA MODULE -->
 <div class="card">
-<!-- MAIN FOLDER: DAILY PRODUCTION -->
+<div class="folder">
+<div class="folder-header" onclick="toggleFolder('posModule')">
+<span>🛒 POS / BENTA</span>
+<span class="arrow" id="arrow-posModule">▶</span>
+</div>
+<div class="folder-content" id="posModule">
+
+  <!-- CART -->
+  <div style="background:white;padding:8px;border-radius:6px;margin-bottom:8px;">
+    <div style="font-weight:bold;font-size:13px;margin-bottom:5px;">Current Order:</div>
+    <div id="cartItems" style="max-height:200px;overflow-y:auto;">
+      <div style="text-align:center;color:#999;padding:20px;font-size:11px;">Cart is empty</div>
+    </div>
+    <div class="cart-total">
+      <span>TOTAL:</span>
+      <span>₱<span id="cartTotal">0.00</span></span>
+    </div>
+    <div class="btn-group" style="margin-top:8px;">
+      <button class="btn btn-checkout" onclick="checkout()">💰 CHECKOUT</button>
+      <button class="btn btn-clear" onclick="clearCart()">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <!-- PRODUCT LIST FOR POS -->
+  <div class="cat-folder">
+  <div class="cat-header" onclick="toggleFolder('posCat65')">
+  <span>65's</span>
+  <span class="arrow" id="arrow-posCat65">▶</span>
+  </div>
+  <div class="cat-content" id="posCat65"></div>
+  </div>
+
+  <div class="cat-folder">
+  <div class="cat-header" onclick="toggleFolder('posCat30')">
+  <span>30's</span>
+  <span class="arrow" id="arrow-posCat30">▶</span>
+  </div>
+  <div class="cat-content" id="posCat30"></div>
+  </div>
+
+  <div class="cat-folder">
+  <div class="cat-header" onclick="toggleFolder('posCatBig')">
+  <span>BIG SIOMAI</span>
+  <span class="arrow" id="arrow-posCatBig">▶</span>
+  </div>
+  <div class="cat-content" id="posCatBig"></div>
+  </div>
+
+  <div class="cat-folder">
+  <div class="cat-header" onclick="toggleFolder('posCatDumps')">
+  <span>DUMPLINGS</span>
+  <span class="arrow" id="arrow-posCatDumps">▶</span>
+  </div>
+  <div class="cat-content" id="posCatDumps"></div>
+  </div>
+
+  <div class="cat-folder">
+  <div class="cat-header" onclick="toggleFolder('posCatSiopao')">
+  <span>SIOPAO</span>
+  <span class="arrow" id="arrow-posCatSiopao">▶</span>
+  </div>
+  <div class="cat-content" id="posCatSiopao"></div>
+  </div>
+
+  <div class="cat-folder">
+  <div class="cat-header" onclick="toggleFolder('posCatExtras')">
+  <span>SAUCE / EXTRAS</span>
+  <span class="arrow" id="arrow-posCatExtras">▶</span>
+  </div>
+  <div class="cat-content" id="posCatExtras"></div>
+  </div>
+
+</div>
+</div>
+</div>
+
+<!-- DAILY PRODUCTION MODULE -->
+<div class="card">
 <div class="folder">
 <div class="folder-header" onclick="toggleFolder('mainProd')">
 <span>📅 DAILY PRODUCTION</span>
@@ -75,7 +163,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 </div>
 <div class="folder-content" id="mainProd">
 
-  <!-- SUB FOLDER: 65's -->
   <div class="cat-folder">
   <div class="cat-header" onclick="toggleFolder('cat65')">
   <span>65's</span>
@@ -84,7 +171,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
   <div class="cat-content" id="cat65"></div>
   </div>
 
-  <!-- SUB FOLDER: 30's -->
   <div class="cat-folder">
   <div class="cat-header" onclick="toggleFolder('cat30')">
   <span>30's</span>
@@ -93,7 +179,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
   <div class="cat-content" id="cat30"></div>
   </div>
 
-  <!-- SUB FOLDER: BIG SIOMAI -->
   <div class="cat-folder">
   <div class="cat-header" onclick="toggleFolder('catBig')">
   <span>BIG SIOMAI</span>
@@ -102,7 +187,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
   <div class="cat-content" id="catBig"></div>
   </div>
 
-  <!-- SUB FOLDER: DUMPLINGS -->
   <div class="cat-folder">
   <div class="cat-header" onclick="toggleFolder('catDumps')">
   <span>DUMPLINGS</span>
@@ -111,7 +195,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
   <div class="cat-content" id="catDumps"></div>
   </div>
 
-  <!-- SUB FOLDER: SIOPAO -->
   <div class="cat-folder">
   <div class="cat-header" onclick="toggleFolder('catSiopao')">
   <span>SIOPAO</span>
@@ -120,7 +203,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
   <div class="cat-content" id="catSiopao"></div>
   </div>
 
-  <!-- SUB FOLDER: SAUCE/EXTRAS -->
   <div class="cat-folder">
   <div class="cat-header" onclick="toggleFolder('catExtras')">
   <span>SAUCE / EXTRAS</span>
@@ -135,7 +217,26 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 
 <div class="card">
 <h3>📋 Today's Production Logs</h3>
-<div id="productionLogsList" style="max-height:300px;overflow-y:auto;"></div>
+<div id="productionLogsList" style="max-height:200px;overflow-y:auto;"></div>
+</div>
+
+<div class="card">
+<h3>🧾 Today's Transactions</h3>
+<div id="transactionLogsList" style="max-height:200px;overflow-y:auto;"></div>
+</div>
+
+<!-- ADD TO CART MODAL -->
+<div id="addCartModal" class="modal">
+<div class="modal-content">
+<h3>🛒 Add to Cart</h3>
+<div id="cartProductName" style="font-weight:bold;margin-bottom:10px;"></div>
+<div style="font-size:12px;color:#666;margin-bottom:5px;">Price: ₱<span id="cartProductPrice"></span> | Stock: <span id="cartProductStock"></span> pcs</div>
+<input id="cartQty" type="number" placeholder="Quantity" value="1" min="1">
+<div class="modal-btns">
+<button class="btn" onclick="confirmAddToCart()">Add to Cart</button>
+<button class="btn" style="background:#999" onclick="closeModal('addCartModal')">Cancel</button>
+</div>
+</div>
 </div>
 
 <!-- EDIT PRICE MODAL -->
@@ -198,22 +299,26 @@ var products = [
 ];
 
 var productionLogs = [];
+var transactions = [];
+var cart = [];
 var currentEditId = null;
 var currentLogId = null;
+var currentCartId = null;
+var sales = 0;
+var expenses = 0;
+var itemsSold = 0;
 
 function toggleFolder(id){
-  // 1. Isara muna lahat ng category folders pag category ang pinindot
-  var allCatFolders = ['cat65','cat30','catBig','catDumps','catSiopao','catExtras'];
+  var allCatFolders = ['cat65','cat30','catBig','catDumps','catSiopao','catExtras','posCat65','posCat30','posCatBig','posCatDumps','posCatSiopao','posCatExtras'];
   if(allCatFolders.indexOf(id)!== -1){
     for(var i=0;i<allCatFolders.length;i++){
-      if(allCatFolders[i]!== id){
+      if(allCatFolders[i]!== id && allCatFolders[i].startsWith(id.substring(0,3))){
         document.getElementById(allCatFolders[i]).classList.remove('active');
         document.getElementById('arrow-'+allCatFolders[i]).classList.remove('open');
       }
     }
   }
 
-  // 2. Tapos i-toggle yung pinindot
   var content = document.getElementById(id);
   var arrow = document.getElementById('arrow-'+id);
   if(content.classList.contains('active')){
@@ -255,129 +360,20 @@ function renderCategories(){
   }
 }
 
-function openEditPrice(id){
-  currentEditId = id;
-  var p = products.find(x=>x.id===id);
-  document.getElementById('editProductName').textContent = p.name;
-  document.getElementById('newPrice').value = p.price;
-  document.getElementById('editPriceModal').style.display = 'block';
-}
+function renderPOSCategories(){
+  var cats = {
+    '65\'s':'posCat65',
+    '30\'s':'posCat30',
+    'BIG SIOMAI':'posCatBig',
+    'DUMPLINGS':'posCatDumps',
+    'SIOPAO':'posCatSiopao',
+    'EXTRAS':'posCatExtras'
+  };
 
-function saveNewPrice(){
-  var newPrice = parseFloat(document.getElementById('newPrice').value);
-  if(isNaN(newPrice) || newPrice<0){alert('Enter valid price!');return}
-  var p = products.find(x=>x.id===currentEditId);
-  p.price = newPrice;
-  saveData();
-  renderCategories();
-  closeModal('editPriceModal');
-  alert('Price updated to ₱'+newPrice);
-}
-
-function openLogProduction(id){
-  currentLogId = id;
-  var p = products.find(x=>x.id===id);
-  document.getElementById('logProductName').textContent = p.name;
-  document.getElementById('logDate').valueAsDate = new Date();
-  document.getElementById('logQty').value = '';
-  document.getElementById('logWaste').value = '';
-  document.getElementById('logWrapper').value = '';
-  document.getElementById('logDesc').value = '';
-  document.getElementById('logProdModal').style.display = 'block';
-}
-
-function saveProductionLog(){
-  var date = document.getElementById('logDate').value;
-  var qty = parseInt(document.getElementById('logQty').value)||0;
-  var waste = parseInt(document.getElementById('logWaste').value)||0;
-  var wrapper = parseInt(document.getElementById('logWrapper').value)||0;
-  var desc = document.getElementById('logDesc').value.trim();
-
-  if(!date || qty<=0){
-    alert('Fill Date and Qty Produced!');
-    return;
-  }
-
-  var p = products.find(x=>x.id===currentLogId);
-
-  productionLogs.unshift({
-    id:Date.now(),
-    date:date,
-    productId:p.id,
-    productName:p.name,
-    qty:qty,
-    waste:waste,
-    wrapper:wrapper,
-    desc:desc
-  });
-
-  // WASTE = GRAMS LANG, HINDI BAWAS SA STOCK
-  p.stock += qty;
-
-  saveData();
-  renderCategories();
-  renderProductionLogs();
-  closeModal('logProdModal');
-  alert('Production logged! +'+qty+' added to '+p.name+' stock');
-}
-
-function renderProductionLogs(){
-  var html = '';
-  var today = new Date().toISOString().split('T')[0];
-  var todayLogs = productionLogs.filter(log => log.date === today);
-
-  if(todayLogs.length===0){
-    html = '<div style="font-size:11px;color:#999;text-align:center;">No production today</div>';
-  } else {
-    for(var i=0;i<todayLogs.length;i++){
-      var log = todayLogs[i];
-      html += '<div class="log-item">';
-      html += '<div class="log-item-name">'+log.productName+' - '+log.qty+'pcs';
-      if(log.waste>0) html += ' <span class="waste-text">(waste: '+log.waste+'g)</span>';
-      if(log.wrapper>0) html += ' <span class="wrapper-text">[wrapper: '+log.wrapper+'g]</span>';
-      html += '</div>';
-      if(log.desc) html += '<div style="color:#666;font-size:10px;">'+log.desc+'</div>';
-      html += '<div style="color:#999;font-size:9px;">'+log.date+'</div>';
-      html += '</div>';
-    }
-  }
-  document.getElementById('productionLogsList').innerHTML = html;
-}
-
-function closeModal(id){
-  document.getElementById(id).style.display = 'none';
-}
-
-function saveData(){
-  localStorage.setItem('products',JSON.stringify(products));
-  localStorage.setItem('productionLogs',JSON.stringify(productionLogs));
-}
-
-function resetDay(){
-  if(confirm('Reset all logs for new day?')){
-    productionLogs = [];
-    saveData();
-    renderProductionLogs();
-  }
-}
-
-function updateSummary(){
-  document.getElementById('sales').textContent = '0.00';
-  document.getElementById('expenses').textContent = '0.00';
-  document.getElementById('net').textContent = '0.00';
-  document.getElementById('itemsSold').textContent = '0';
-  document.getElementById('transCount').textContent = '0';
-}
-
-// AUTO RUN
-var savedProducts = localStorage.getItem('products');
-if(savedProducts) products = JSON.parse(savedProducts);
-var savedLogs = localStorage.getItem('productionLogs');
-if(savedLogs) productionLogs = JSON.parse(savedLogs);
-
-renderCategories();
-renderProductionLogs();
-updateSummary();
-</script>
-</body>
-</html>
+  for(var cat in cats){
+    var html = '';
+    var filtered = products.filter(p=>p.cat===cat);
+    for(var i=0;i<filtered.length;i++){
+      var p = filtered[i];
+      html += '<div class="product-box">';
+      html += '<div class="product-name">'+p.name
