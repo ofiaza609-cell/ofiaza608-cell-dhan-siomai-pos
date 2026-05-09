@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>One SIOMAi POS V3.12</title>
+<title>One SIOMAi POS V3.13</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--primary:#FF6B35;--dark:#2C3E50;--light:#ECF0F1;--green:#27AE60;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6}
@@ -72,7 +72,7 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 <body>
 
 <div class="header">
-  <h1>🥟 One SIOMAi POS V3.12</h1>
+  <h1>🥟 One SIOMAi POS V3.13</h1>
 </div>
 
 <div class="summary">
@@ -172,14 +172,14 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 
 <script>
 var products = [
-  // 65's - COMPLETE NA BOSS
+  // 65's
   {id:1,name:'Pork 65\'s',cat:'65\'s',stock:1002,price:160},
   {id:2,name:'Chicken 65\'s',cat:'65\'s',stock:100,price:150},
   {id:3,name:'Beef 65\'s',cat:'65\'s',stock:100,price:150},
   {id:4,name:'Japanese 65\'s',cat:'65\'s',stock:100,price:160},
   {id:5,name:'Shrimp 65\'s',cat:'65\'s',stock:100,price:170},
 
-  // 30's - COMPLETE NA BOSS
+  // 30's
   {id:6,name:'Pork 30\'s',cat:'30\'s',stock:93,price:80},
   {id:7,name:'Chicken 30\'s',cat:'30\'s',stock:100,price:80},
   {id:8,name:'Beef 30\'s',cat:'30\'s',stock:100,price:80},
@@ -203,7 +203,7 @@ var products = [
   {id:20,name:'Mini Bola Bola',cat:'SIOPAO',stock:100,price:209},
   {id:21,name:'Mini ASADO',cat:'SIOPAO',stock:100,price:200},
 
-  // SAUCE - MAY LAMAN NA BOSS
+  // SAUCE
   {id:22,name:'Chili Garlic Sauce',cat:'SAUCE',stock:100,price:15},
   {id:23,name:'Toyomansi',cat:'SAUCE',stock:100,price:10},
   {id:24,name:'Calamansi',cat:'SAUCE',stock:100,price:5},
@@ -247,9 +247,23 @@ function toggleMainFolder(type){
   }
 }
 
+// FIXED: ISASARA NA LAHAT NG IBA PAG NAG OPEN NG ISA
 function toggleSubFolder(el){
   var content = el.nextElementSibling;
-  content.classList.toggle('active');
+  var parent = el.parentElement.parentElement;
+  var allSubContents = parent.querySelectorAll('.sub-folder-content');
+
+  var isActive = content.classList.contains('active');
+
+  // Sara lahat muna
+  for(var i=0;i<allSubContents.length;i++){
+    allSubContents[i].classList.remove('active');
+  }
+
+  // Kung hindi pa active, buksan
+  if(!isActive){
+    content.classList.add('active');
+  }
 }
 
 function renderCategories(){
