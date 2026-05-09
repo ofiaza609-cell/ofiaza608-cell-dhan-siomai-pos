@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>One SIOMAi POS V3.8</title>
+<title>One SIOMAi POS V3.9</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--primary:#FF6B35;--dark:#2C3E50;--light:#ECF0F1;--green:#27AE60;--red:#E74C3C;--blue:#3498DB}
+:root{--primary:#FF6B35;--dark:#2C3E50;--light:#ECF0F1;--green:#27AE60;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6}
 body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-bottom:80px}
 .header{background:var(--primary);color:#fff;padding:15px;text-align:center;border-radius:10px;margin-bottom:10px}
 .header h1{font-size:20px}
 .summary{background:#fff;padding:15px;border-radius:10px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
 .summary-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px}
 .summary-row.net{border-top:2px solid var(--primary);padding-top:8px;margin-top:8px;font-weight:700;font-size:16px}
+.action-buttons{display:flex;gap:10px;margin-top:10px}
+.action-buttons button{flex:1}
 .main-folder{background:#fff;border-radius:10px;margin-bottom:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);overflow:hidden}
 .folder{
   background:var(--primary);
@@ -48,6 +50,7 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 .btn{padding:8px 15px;border:none;border-radius:5px;cursor:pointer;font-weight:600;font-size:13px}
 .btn-add{background:var(--green);color:#fff}
 .btn-primary{background:var(--primary);color:#fff;width:100%;padding:12px;margin-top:10px}
+.btn-purple{background:var(--purple);color:#fff}
 .cart{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:3px solid var(--primary);padding:10px;box-shadow:0 -2px 10px rgba(0,0,0,0.1);max-height:40vh;overflow-y:auto}
 .cart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:700}
 .cart-item{display:flex;justify-content:space-between;padding:8px;background:#f9f9f9;margin-bottom:5px;border-radius:5px;font-size:13px}
@@ -61,14 +64,14 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 .modal-buttons button{flex:1;padding:10px;border:none;border-radius:5px;font-weight:600;cursor:pointer}
 .btn-cancel{background:#95a5a6;color:#fff}
 .btn-confirm{background:var(--primary);color:#fff}
-.log-item,.trans-item{padding:10px;background:#f9f9f9;margin-bottom:8px;border-radius:5px;font-size:13px}
-.log-time,.trans-time{font-size:11px;color:#7f8c8d}
+.log-item,.trans-item,.exp-item{padding:10px;background:#f9f9f9;margin-bottom:8px;border-radius:5px;font-size:13px}
+.log-time,.trans-time,.exp-time{font-size:11px;color:#7f8c8d}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>🥟 One SIOMAi POS V3.8</h1>
+  <h1>🥟 One SIOMAi POS V3.9</h1>
 </div>
 
 <div class="summary">
@@ -77,7 +80,10 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   <div class="summary-row"><span>Items Sold:</span><span id="itemsSold">0 pcs</span></div>
   <div class="summary-row"><span>Transactions:</span><span id="transactions">0</span></div>
   <div class="summary-row net"><span>Net:</span><span id="net">₱0.00</span></div>
-  <button class="btn btn-primary" onclick="resetDay()">Reset Day</button>
+  <div class="action-buttons">
+    <button class="btn btn-purple" onclick="addExpense()">💸 Add Expense</button>
+    <button class="btn btn-primary" onclick="resetDay()">Reset Day</button>
+  </div>
 </div>
 
 <div class="folder" onclick="toggleMainFolder('POS')">
@@ -89,6 +95,11 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   <span>📦 DAILY PRODUCTION</span><span id="arrowPRODUCTION">▶</span>
 </div>
 <div class="folder-content" id="contentPRODUCTION"></div>
+
+<div class="main-folder">
+  <div class="sub-folder-header" onclick="toggleSubFolder(this)">💸 Today's Expenses</div>
+  <div class="sub-folder-content" id="expensesList"></div>
+</div>
 
 <div class="main-folder">
   <div class="sub-folder-header" onclick="toggleSubFolder(this)">📋 Today's Production Logs</div>
@@ -136,16 +147,62 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   </div>
 </div>
 
+<div class="modal" id="addExpenseModal">
+  <div class="modal-content">
+    <h3>Add Expense</h3>
+    <select id="expType">
+      <option value="Uling">Uling</option>
+      <option value="Gas">Gas</option>
+      <option value="Yelo">Yelo</option>
+      <option value="Sahod">Sahod</option>
+      <option value="Mantika">Mantika</option>
+      <option value="Plastic">Plastic/Supot</option>
+      <option value="Pamasahe">Pamasahe</option>
+      <option value="Iba pa">Iba pa</option>
+    </select>
+    <input type="number" id="expAmount" placeholder="Amount ₱" min="1">
+    <input type="text" id="expNote" placeholder="Note (optional)">
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="closeModal('addExpenseModal')">Cancel</button>
+      <button class="btn-confirm" onclick="confirmAddExpense()">Add</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var products = [
+  // 65's
   {id:1,name:'Pork 65\'s',cat:'65\'s',stock:1002,price:160},
   {id:2,name:'Chicken 65\'s',cat:'65\'s',stock:100,price:150},
   {id:3,name:'Beef 65\'s',cat:'65\'s',stock:100,price:150},
   {id:4,name:'Japanese 65\'s',cat:'65\'s',stock:100,price:160},
-  {id:5,name:'Pork 30\'s',cat:'30\'s',stock:93,price:80},
-  {id:6,name:'Chicken 30\'s',cat:'30\'s',stock:100,price:80},
-  {id:7,name:'Beef 30\'s',cat:'30\'s',stock:100,price:80},
-  {id:8,name:'Japanese 30\'s',cat:'30\'s',stock:100,price:80}
+  {id:5,name:'Shrimp 65\'s',cat:'65\'s',stock:100,price:170},
+
+  // 30's
+  {id:6,name:'Pork 30\'s',cat:'30\'s',stock:93,price:80},
+  {id:7,name:'Chicken 30\'s',cat:'30\'s',stock:100,price:80},
+  {id:8,name:'Beef 30\'s',cat:'30\'s',stock:100,price:80},
+  {id:9,name:'Japanese 30\'s',cat:'30\'s',stock:100,price:80},
+  {id:10,name:'Shrimp 30\'s',cat:'30\'s',stock:100,price:85},
+
+  // BIG SIOMAI
+  {id:11,name:'Pork Big Siomai',cat:'BIG SIOMAI',stock:50,price:25},
+  {id:12,name:'Chicken Big Siomai',cat:'BIG SIOMAI',stock:50,price:25},
+  {id:13,name:'Beef Big Siomai',cat:'BIG SIOMAI',stock:50,price:25},
+
+  // DUMPLINGS
+  {id:14,name:'Pork Dumplings',cat:'DUMPLINGS',stock:50,price:20},
+  {id:15,name:'Shrimp Dumplings',cat:'DUMPLINGS',stock:50,price:25},
+  {id:16,name:'Sharksfin Dumplings',cat:'DUMPLINGS',stock:50,price:25},
+
+  // SIOPAO
+  {id:17,name:'Asado Siopao',cat:'SIOPAO',stock:50,price:30},
+  {id:18,name:'Bola-Bola Siopao',cat:'SIOPAO',stock:50,price:30},
+
+  // SAUCE
+  {id:19,name:'Chili Garlic Sauce',cat:'SAUCE',stock:100,price:15},
+  {id:20,name:'Toyomansi',cat:'SAUCE',stock:100,price:10},
+  {id:21,name:'Calamansi',cat:'SAUCE',stock:100,price:5}
 ];
 
 var sales = 0;
@@ -154,6 +211,7 @@ var itemsSold = 0;
 var cart = [];
 var productionLogs = [];
 var transactions = [];
+var expensesList = [];
 var currentCartId = 0;
 var currentProdId = 0;
 
@@ -161,6 +219,7 @@ function saveData(){
   localStorage.setItem('products',JSON.stringify(products));
   localStorage.setItem('productionLogs',JSON.stringify(productionLogs));
   localStorage.setItem('transactions',JSON.stringify(transactions));
+  localStorage.setItem('expensesList',JSON.stringify(expensesList));
   localStorage.setItem('sales',sales);
   localStorage.setItem('expenses',expenses);
   localStorage.setItem('itemsSold',itemsSold);
@@ -188,7 +247,7 @@ function toggleSubFolder(el){
 }
 
 function renderCategories(){
-  var cats = ['65\'s','30\'s'];
+  var cats = ['65\'s','30\'s','BIG SIOMAI','DUMPLINGS','SIOPAO','SAUCE'];
   var html = '';
   for(var i=0;i<cats.length;i++){
     var cat = cats[i];
@@ -205,7 +264,7 @@ function renderCategories(){
 }
 
 function renderPOSCategories(){
-  var cats = ['65\'s','30\'s'];
+  var cats = ['65\'s','30\'s','BIG SIOMAI','DUMPLINGS','SIOPAO','SAUCE'];
   var html = '';
   for(var i=0;i<cats.length;i++){
     var cat = cats[i];
@@ -347,6 +406,49 @@ function checkout(){
   alert('Checkout successful! ₱'+total.toFixed(2)+' | Stock updated');
 }
 
+function addExpense(){
+  document.getElementById('expAmount').value = '';
+  document.getElementById('expNote').value = '';
+  document.getElementById('addExpenseModal').classList.add('active');
+}
+
+function confirmAddExpense(){
+  var type = document.getElementById('expType').value;
+  var amount = parseFloat(document.getElementById('expAmount').value)||0;
+  var note = document.getElementById('expNote').value;
+
+  if(amount<=0){alert('Enter valid amount!');return}
+
+  expenses += amount;
+  expensesList.unshift({
+    id:Date.now(),
+    type:type,
+    amount:amount,
+    note:note,
+    time:new Date().toLocaleTimeString()
+  });
+
+  saveData();
+  renderExpenses();
+  updateSummary();
+  closeModal('addExpenseModal');
+}
+
+function renderExpenses(){
+  var html = '';
+  if(expensesList.length===0){
+    html = '<div style="padding:20px;text-align:center;color:#7f8c8d">No expenses yet</div>';
+  }else{
+    for(var i=0;i<expensesList.length;i++){
+      var exp = expensesList[i];
+      html += '<div class="exp-item"><div><strong>'+exp.type+'</strong>: ₱'+exp.amount.toFixed(2)+'</div>';
+      if(exp.note) html += '<div style="font-size:12px;color:#7f8c8d">'+exp.note+'</div>';
+      html += '<div class="exp-time">'+exp.time+'</div></div>';
+    }
+  }
+  document.getElementById('expensesList').innerHTML = html;
+}
+
 function renderProductionLogs(){
   var html = '';
   if(productionLogs.length===0){
@@ -393,17 +495,14 @@ function resetDay(){
   cart = [];
   productionLogs = [];
   transactions = [];
-  for(var i=0;i<products.length;i++){
-    products[i].stock = 100;
-  }
-  products[0].stock = 1002;
-  products[4].stock = 93;
+  expensesList = [];
   saveData();
   renderCategories();
   renderPOSCategories();
   renderCart();
   renderProductionLogs();
   renderTransactions();
+  renderExpenses();
   updateSummary();
   alert('Day reset complete!');
 }
@@ -419,6 +518,8 @@ var savedLogs = localStorage.getItem('productionLogs');
 if(savedLogs) productionLogs = JSON.parse(savedLogs);
 var savedTrans = localStorage.getItem('transactions');
 if(savedTrans) transactions = JSON.parse(savedTrans);
+var savedExp = localStorage.getItem('expensesList');
+if(savedExp) expensesList = JSON.parse(savedExp);
 sales = parseFloat(localStorage.getItem('sales'))||0;
 expenses = parseFloat(localStorage.getItem('expenses'))||0;
 itemsSold = parseInt(localStorage.getItem('itemsSold'))||0;
@@ -427,6 +528,7 @@ renderCategories();
 renderPOSCategories();
 renderProductionLogs();
 renderTransactions();
+renderExpenses();
 updateSummary();
 </script>
 
