@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>One SIOMAi POS V3.13</title>
+<title>One SIOMAi POS V3.14</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--primary:#FF6B35;--dark:#2C3E50;--light:#ECF0F1;--green:#27AE60;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6}
@@ -53,7 +53,7 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 .btn-purple{background:var(--purple);color:#fff}
 .cart{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:3px solid var(--primary);padding:10px;box-shadow:0 -2px 10px rgba(0,0,0,0.1);max-height:40vh;overflow-y:auto}
 .cart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:700}
-.cart-item{display:flex;justify-content:space-between;padding:8px;background:#f9f9f9;margin-bottom:5px;border-radius:5px;font-size:13px}
+.cart-item{display:flex;justify-content:space-between;padding:8px;background:#f9f9;margin-bottom:5px;border-radius:5px;font-size:13px}
 .cart-total{display:flex;justify-content:space-between;font-weight:700;font-size:16px;padding:10px 0;border-top:2px solid var(--primary);margin-top:5px}
 .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
 .modal.active{display:flex}
@@ -64,7 +64,7 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 .modal-buttons button{flex:1;padding:10px;border:none;border-radius:5px;font-weight:600;cursor:pointer}
 .btn-cancel{background:#95a5a6;color:#fff}
 .btn-confirm{background:var(--primary);color:#fff}
-.log-item,.trans-item,.exp-item{padding:10px;background:#f9f9f9;margin-bottom:8px;border-radius:5px;font-size:13px}
+.log-item,.trans-item,.exp-item{padding:10px;background:#f9f9;margin-bottom:8px;border-radius:5px;font-size:13px}
 .log-time,.trans-time,.exp-time{font-size:11px;color:#7f8c8d}
 .empty{padding:20px;text-align:center;color:#7f8c8d;font-size:13px}
 </style>
@@ -72,7 +72,7 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 <body>
 
 <div class="header">
-  <h1>🥟 One SIOMAi POS V3.13</h1>
+  <h1>🥟 One SIOMAi POS V3.14</h1>
 </div>
 
 <div class="summary">
@@ -172,15 +172,15 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 
 <script>
 var products = [
-  // 65's
-  {id:1,name:'Pork 65\'s',cat:'65\'s',stock:1002,price:160},
+  // 65's - COMPLETE NA BOSS
+  {id:1,name:'Pork 65\'s',cat:'65\'s',stock:100,price:160},
   {id:2,name:'Chicken 65\'s',cat:'65\'s',stock:100,price:150},
   {id:3,name:'Beef 65\'s',cat:'65\'s',stock:100,price:150},
   {id:4,name:'Japanese 65\'s',cat:'65\'s',stock:100,price:160},
   {id:5,name:'Shrimp 65\'s',cat:'65\'s',stock:100,price:170},
 
-  // 30's
-  {id:6,name:'Pork 30\'s',cat:'30\'s',stock:93,price:80},
+  // 30's - COMPLETE NA BOSS
+  {id:6,name:'Pork 30\'s',cat:'30\'s',stock:100,price:80},
   {id:7,name:'Chicken 30\'s',cat:'30\'s',stock:100,price:80},
   {id:8,name:'Beef 30\'s',cat:'30\'s',stock:100,price:80},
   {id:9,name:'Japanese 30\'s',cat:'30\'s',stock:100,price:80},
@@ -203,7 +203,7 @@ var products = [
   {id:20,name:'Mini Bola Bola',cat:'SIOPAO',stock:100,price:209},
   {id:21,name:'Mini ASADO',cat:'SIOPAO',stock:100,price:200},
 
-  // SAUCE
+  // SAUCE - MERON NA BOSS
   {id:22,name:'Chili Garlic Sauce',cat:'SAUCE',stock:100,price:15},
   {id:23,name:'Toyomansi',cat:'SAUCE',stock:100,price:10},
   {id:24,name:'Calamansi',cat:'SAUCE',stock:100,price:5},
@@ -247,22 +247,27 @@ function toggleMainFolder(type){
   }
 }
 
-// FIXED: ISASARA NA LAHAT NG IBA PAG NAG OPEN NG ISA
+// V3.14 FIX: AUTO CLOSE NA LAHAT NG IBA
 function toggleSubFolder(el){
   var content = el.nextElementSibling;
   var parent = el.parentElement.parentElement;
   var allSubContents = parent.querySelectorAll('.sub-folder-content');
+  var allHeaders = parent.querySelectorAll('.sub-folder-header span');
 
   var isActive = content.classList.contains('active');
 
-  // Sara lahat muna
+  // Sara lahat muna + reset arrow
   for(var i=0;i<allSubContents.length;i++){
     allSubContents[i].classList.remove('active');
+  }
+  for(var i=0;i<allHeaders.length;i++){
+    allHeaders[i].textContent = '▼';
   }
 
   // Kung hindi pa active, buksan
   if(!isActive){
     content.classList.add('active');
+    el.querySelector('span').textContent = '▲';
   }
 }
 
