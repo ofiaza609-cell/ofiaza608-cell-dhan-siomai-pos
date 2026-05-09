@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One SIOMAi POS V3</title>
+<title>One SIOMAi POS V3.1</title>
 <meta name="theme-color" content="#FF6B35">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
@@ -56,7 +56,7 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 </style>
 </head>
 <body>
-<div class="header">🥟 One SIOMAi POS V3</div>
+<div class="header">🥟 One SIOMAi POS V3.1</div>
 
 <div class="summary">
 <div class="summary-row"><span>Sales:</span><span>₱<span id="sales">0.00</span></span></div>
@@ -202,6 +202,18 @@ var currentEditId = null;
 var currentLogId = null;
 
 function toggleFolder(id){
+  // 1. Isara muna lahat ng category folders pag category ang pinindot
+  var allCatFolders = ['cat65','cat30','catBig','catDumps','catSiopao','catExtras'];
+  if(allCatFolders.indexOf(id)!== -1){
+    for(var i=0;i<allCatFolders.length;i++){
+      if(allCatFolders[i]!== id){
+        document.getElementById(allCatFolders[i]).classList.remove('active');
+        document.getElementById('arrow-'+allCatFolders[i]).classList.remove('open');
+      }
+    }
+  }
+
+  // 2. Tapos i-toggle yung pinindot
   var content = document.getElementById(id);
   var arrow = document.getElementById('arrow-'+id);
   if(content.classList.contains('active')){
@@ -350,7 +362,6 @@ function resetDay(){
 }
 
 function updateSummary(){
-  // Simple lang for now
   document.getElementById('sales').textContent = '0.00';
   document.getElementById('expenses').textContent = '0.00';
   document.getElementById('net').textContent = '0.00';
