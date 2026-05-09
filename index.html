@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One SIOMAi POS V3.5</title>
+<title>One SIOMAi POS V3.6</title>
 <meta name="theme-color" content="#FF6B35">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
@@ -64,7 +64,7 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 </style>
 </head>
 <body>
-<div class="header">🥟 One SIOMAi POS V3.5</div>
+<div class="header">🥟 One SIOMAi POS V3.6</div>
 
 <div class="summary">
 <div class="summary-row"><span>Sales:</span><span>₱<span id="sales">0.00</span></span></div>
@@ -273,12 +273,12 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 
 <script>
 var products = [
-  {id:1,name:'Pork 65s',price:160,stock:602,cat:'65s'},
-  {id:2,name:'Chicken 65s',price:150,stock:100,cat:'65s'},
-  {id:3,name:'Beef 65s',price:150,stock:100,cat:'65s'},
-  {id:5,name:'Pork 30s',price:80,stock:93,cat:'30s'},
-  {id:6,name:'Chicken 30s',price:80,stock:100,cat:'30s'},
-  {id:7,name:'Beef 30s',price:80,stock:100,cat:'30s'},
+  {id:1,name:'Pork 65\'s',price:160,stock:602,cat:'65s'},
+  {id:2,name:'Chicken 65\'s',price:150,stock:100,cat:'65s'},
+  {id:3,name:'Beef 65\'s',price:150,stock:100,cat:'65s'},
+  {id:5,name:'Pork 30\'s',price:80,stock:93,cat:'30s'},
+  {id:6,name:'Chicken 30\'s',price:80,stock:100,cat:'30s'},
+  {id:7,name:'Beef 30\'s',price:80,stock:100,cat:'30s'},
   {id:8,name:'Pork Big Siomai',price:120,stock:86,cat:'BIG SIOMAI'},
   {id:9,name:'Chicken Big Siomai',price:120,stock:100,cat:'BIG SIOMAI'},
   {id:10,name:'Beef Big Siomai',price:120,stock:100,cat:'BIG SIOMAI'},
@@ -290,9 +290,9 @@ var products = [
   {id:30,name:'MINI SIOPAO',price:200,stock:100,cat:'SIOPAO'},
   {id:31,name:'Mini Bola Bola',price:209,stock:100,cat:'SIOPAO'},
   {id:32,name:'Mini ASADO',price:200,stock:100,cat:'SIOPAO'},
-  {id:19,name:'Chili Garlic',price:75,stock:999,cat:'EXTRAS'},
-  {id:28,name:'Siopao Sauce',price:0,stock:999,cat:'EXTRAS'},
-  {id:29,name:'Water',price:50,stock:100,cat:'EXTRAS'}
+  {id:19,name:'Chili Garlic',price:75,stock:999,cat:'SAUCE / EXTRAS'},
+  {id:28,name:'Siopao Sauce',price:0,stock:999,cat:'SAUCE / EXTRAS'},
+  {id:29,name:'Water',price:50,stock:100,cat:'SAUCE / EXTRAS'}
 ];
 
 var productionLogs = [];
@@ -362,7 +362,7 @@ function renderCategories(){
     'BIG SIOMAI':'catBig',
     'DUMPLINGS':'catDumps',
     'SIOPAO':'catSiopao',
-    'EXTRAS':'catExtras'
+    'SAUCE / EXTRAS':'catExtras'
   };
 
   for(var cat in cats){
@@ -392,7 +392,7 @@ function renderPOSCategories(){
     'BIG SIOMAI':'posCatBig',
     'DUMPLINGS':'posCatDumps',
     'SIOPAO':'posCatSiopao',
-    'EXTRAS':'posCatExtras'
+    'SAUCE / EXTRAS':'posCatExtras'
   };
 
   for(var cat in cats){
@@ -625,63 +625,4 @@ function renderTransactions(){
         html += t.items[j].name+' x'+t.items[j].qty;
         if(j<t.items.length-1) html += ', ';
       }
-      html += '</div></div>';
-    }
-  }
-  document.getElementById('transactionLogsList').innerHTML = html;
-}
-
-function closeModal(id){
-  document.getElementById(id).style.display = 'none';
-}
-
-function saveData(){
-  localStorage.setItem('products',JSON.stringify(products));
-  localStorage.setItem('productionLogs',JSON.stringify(productionLogs));
-  localStorage.setItem('transactions',JSON.stringify(transactions));
-  localStorage.setItem('sales',sales);
-  localStorage.setItem('expenses',expenses);
-  localStorage.setItem('itemsSold',itemsSold);
-}
-
-function resetDay(){
-  if(confirm('Reset all logs and sales for new day?')){
-    productionLogs = [];
-    transactions = [];
-    sales = 0;
-    expenses = 0;
-    itemsSold = 0;
-    saveData();
-    renderProductionLogs();
-    renderTransactions();
-    updateSummary();
-  }
-}
-
-function updateSummary(){
-  document.getElementById('sales').textContent = sales.toFixed(2);
-  document.getElementById('expenses').textContent = expenses.toFixed(2);
-  document.getElementById('net').textContent = (sales-expenses).toFixed(2);
-  document.getElementById('itemsSold').textContent = itemsSold;
-  document.getElementById('transCount').textContent = transactions.filter(t => new Date(t.id).toLocaleDateString() === new Date().toLocaleDateString()).length;
-}
-
-// AUTO RUN
-var savedProducts = localStorage.getItem('products');
-if(savedProducts) products = JSON.parse(savedProducts);
-var savedLogs = localStorage.getItem('productionLogs');
-if(savedLogs) productionLogs = JSON.parse(savedLogs);
-var savedTrans = localStorage.getItem('transactions');
-if(savedTrans) transactions = JSON.parse(savedTrans);
-sales = parseFloat(localStorage.getItem('sales'))||0;
-expenses = parseFloat(localStorage.getItem('expenses'))||0;
-itemsSold = parseInt(localStorage.getItem('itemsSold'))||0;
-
-renderCategories();
-renderPOSCategories();
-renderProductionLogs();
-renderTransactions();
-updateSummary();
-</script>
-</body>
-</html>
+      html += '</div></
