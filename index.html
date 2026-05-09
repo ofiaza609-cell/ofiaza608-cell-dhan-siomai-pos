@@ -127,9 +127,7 @@ th{background:var(--dark);color:#fff;font-weight:600}
   <div class="cart-total">
     <span>Total:</span>
     <span id="cartTotal">₱0.00</span>
-  </div><div class="cart-total"><span>Total:</span><span id="cartTotal">₱0.00</span></div>
-<input type="number" id="cashAmount" placeholder="Cash ni customer" style="width:100%;padding:10px;margin:8px 0;border:2px solid var(--green);border-radius:5px;font-weight:600">
-<button class="btn btn-primary" onclick="checkout()">💰 CHECKOUT</button>
+  </div>
   <button class="btn btn-primary" onclick="checkout()">💰 CHECKOUT</button>
 </div>
 
@@ -400,8 +398,9 @@ function clearCart(){
   cart = [];
   renderCart();
 }
+
 function checkout(){
-  if( function checkout(){if(cart.length===0){alert('Cart is empty!');return}var subtotal=0;var totalItems=0;for(var i=0;i<cart.length;i++){var item=cart[i];var p=products.find(x=>x.id===item.id);if(item.qty>p.stock){alert('Not enough stock for '+p.name+'! Only '+p.stock+' pcs available');return}subtotal+=item.price*item.qty;totalItems+=item.qty}var discountAmount=subtotal*(currentDiscount/100);var total=subtotal-discountAmount;var cash=parseFloat(document.getElementById('cashAmount').value)||0;if(cash<total){alert('Kulang cash! Need ₱'+total.toFixed(2));return}var change=cash-total;var customer=document.getElementById('customerName').value||'Walk-in';if(!confirm('Total: ₱'+total.toFixed(2)+'\nCash: ₱'+cash.toFixed(2)+'\nSukli: ₱'+change.toFixed(2)+'\n\nCheckout?'))return;for(var i=0;i<cart.length;i++){var item=cart[i];var p=products.find(x=>x.id===item.id);p.stock-=item.qty}sales+=total;itemsSold+=totalItems;transactions.unshift({id:Date.now(),time:new Date().toLocaleTimeString(),customer:customer,items:JSON.parse(JSON.stringify(cart)),subtotal:subtotal,discount:currentDiscount,discountAmount:discountAmount,total:total,cash:cash,change:change});generateReceipt(customer,cart,subtotal,currentDiscount,discountAmount,total,cash,change);cart=[];currentDiscount=0;setDiscount(0);document.getElementById('customerName').value='';document.getElementById('cashAmount').value='';saveData();renderCart();renderTransactions();updateSummary();showReceiptModal()}
+  if(cart.length===0){alert('Cart is empty!');return}
 
   var total = 0;
   var totalItems = 0;
