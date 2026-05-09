@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>One SIOMAi POS V3.2</title>
+<title>One SIOMAi POS V3.2.1</title>
 <meta name="theme-color" content="#FF6B35">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
@@ -21,7 +21,6 @@ body { background: #f5f5f5; padding-bottom: 20px; padding-top: 60px; }
 input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin: 3px 0; font-size: 14px; width: 100%; }
 .input-label { font-size: 10px; color: #666; margin-left: 3px; margin-bottom: 5px; }
 
-/* FOLDER STYLES */
 .folder { border: 1px solid #FF6B35; border-radius: 8px; margin: 8px 0; overflow: hidden; }
 .folder-header { background: #FF6B35; color: white; padding: 12px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
 .folder-header:active { background: #E55A2B; }
@@ -65,7 +64,7 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 </style>
 </head>
 <body>
-<div class="header">🥟 One SIOMAi POS V3.2</div>
+<div class="header">🥟 One SIOMAi POS V3.2.1</div>
 
 <div class="summary">
 <div class="summary-row"><span>Sales:</span><span>₱<span id="sales">0.00</span></span></div>
@@ -85,7 +84,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
 </div>
 <div class="folder-content" id="posModule">
 
-  <!-- CART -->
   <div style="background:white;padding:8px;border-radius:6px;margin-bottom:8px;">
     <div style="font-weight:bold;font-size:13px;margin-bottom:5px;">Current Order:</div>
     <div id="cartItems" style="max-height:200px;overflow-y:auto;">
@@ -101,7 +99,6 @@ input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin
     </div>
   </div>
 
-  <!-- PRODUCT LIST FOR POS -->
   <div class="cat-folder">
   <div class="cat-header" onclick="toggleFolder('posCat65')">
   <span>65's</span>
@@ -309,71 +306,34 @@ var expenses = 0;
 var itemsSold = 0;
 
 function toggleFolder(id){
-  var allCatFolders = ['cat65','cat30','catBig','catDumps','catSiopao','catExtras','posCat65','posCat30','posCatBig','posCatDumps','posCatSiopao','posCatExtras'];
-  if(allCatFolders.indexOf(id)!== -1){
-    for(var i=0;i<allCatFolders.length;i++){
-      if(allCatFolders[i]!== id && allCatFolders[i].startsWith(id.substring(0,3))){
-        document.getElementById(allCatFolders[i]).classList.remove('active');
-        document.getElementById('arrow-'+allCatFolders[i]).classList.remove('open');
+  var posCats = ['posCat65','posCat30','posCatBig','posCatDumps','posCatSiopao','posCatExtras'];
+  var prodCats = ['cat65','cat30','catBig','catDumps','catSiopao','catExtras'];
+
+  if(posCats.indexOf(id)!== -1){
+    for(var i=0;i<posCats.length;i++){
+      if(posCats[i]!== id){
+        var el = document.getElementById(posCats[i]);
+        var arr = document.getElementById('arrow-'+posCats[i]);
+        if(el) el.classList.remove('active');
+        if(arr) arr.classList.remove('open');
+      }
+    }
+  } else if(prodCats.indexOf(id)!== -1){
+    for(var i=0;i<prodCats.length;i++){
+      if(prodCats[i]!== id){
+        var el = document.getElementById(prodCats[i]);
+        var arr = document.getElementById('arrow-'+prodCats[i]);
+        if(el) el.classList.remove('active');
+        if(arr) arr.classList.remove('open');
       }
     }
   }
 
   var content = document.getElementById(id);
   var arrow = document.getElementById('arrow-'+id);
+  if(!content) return;
+
   if(content.classList.contains('active')){
     content.classList.remove('active');
-    arrow.classList.remove('open');
+    if(arrow) arrow.classList.remove('open');
   }else{
-    content.classList.add('active');
-    arrow.classList.add('open');
-  }
-}
-
-function renderCategories(){
-  var cats = {
-    '65\'s':'cat65',
-    '30\'s':'cat30',
-    'BIG SIOMAI':'catBig',
-    'DUMPLINGS':'catDumps',
-    'SIOPAO':'catSiopao',
-    'EXTRAS':'catExtras'
-  };
-
-  for(var cat in cats){
-    var html = '';
-    var filtered = products.filter(p=>p.cat===cat);
-    for(var i=0;i<filtered.length;i++){
-      var p = filtered[i];
-      html += '<div class="product-box">';
-      html += '<div class="product-name">'+p.name+'</div>';
-      html += '<div class="product-info">';
-      html += '<span class="product-stock">Stock: '+p.stock+' pcs</span>';
-      html += '<span class="product-price">₱'+p.price+'</span>';
-      html += '</div>';
-      html += '<div class="btn-group">';
-      html += '<button class="btn-edit" onclick="openEditPrice('+p.id+')">✏️ Edit Price</button>';
-      html += '<button class="btn-log" onclick="openLogProduction('+p.id+')">📝 Log Production</button>';
-      html += '</div></div>';
-    }
-    document.getElementById(cats[cat]).innerHTML = html || '<div style="text-align:center;color:#999;padding:10px;">No products</div>';
-  }
-}
-
-function renderPOSCategories(){
-  var cats = {
-    '65\'s':'posCat65',
-    '30\'s':'posCat30',
-    'BIG SIOMAI':'posCatBig',
-    'DUMPLINGS':'posCatDumps',
-    'SIOPAO':'posCatSiopao',
-    'EXTRAS':'posCatExtras'
-  };
-
-  for(var cat in cats){
-    var html = '';
-    var filtered = products.filter(p=>p.cat===cat);
-    for(var i=0;i<filtered.length;i++){
-      var p = filtered[i];
-      html += '<div class="product-box">';
-      html += '<div class="product-name">'+p.name
