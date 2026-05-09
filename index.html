@@ -31,16 +31,17 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
-.folder *{
+/* INALIS KO NA TO - ITO YUNG SALARIN KAYA HINDI MAPINDOT */
+/*.folder *{
   pointer-events:none;
   user-select:none;
   -webkit-user-select:none;
-}
+} */
 .folder-content{display:none;padding:10px}
 .folder-content.active{display:block}
 .sub-folder{margin-bottom:10px;border:1px solid #ddd;border-radius:8px;overflow:hidden}
 .sub-folder-header{background:var(--dark);color:#fff;padding:10px;cursor:pointer;font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
-.sub-folder-content{display:none;padding:10px;background:#f9}
+.sub-folder-content{display:none;padding:10px;background:#f9f9f9}
 .sub-folder-content.active{display:block}
 .product{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff;margin-bottom:8px;border-radius:8px;border-left:4px solid var(--primary)}
 .product-info{flex:1}
@@ -67,10 +68,6 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 .log-item,.trans-item,.exp-item{padding:10px;background:#f9f9f9;margin-bottom:8px;border-radius:5px;font-size:13px}
 .log-time,.trans-time,.exp-time{font-size:11px;color:#7f8c8d}
 .empty{padding:20px;text-align:center;color:#7f8c8d;font-size:13px}
-.checkout-info{background:#f9f9;padding:10px;border-radius:5px;margin-bottom:10px}
-.checkout-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:14px}
-.checkout-row.total{font-weight:700;font-size:16px;border-top:1px solid #ddd;padding-top:5px;margin-top:5px}
-.checkout-row.change{font-weight:700;font-size:18px;color:var(--green)}
 </style>
 </head>
 <body>
@@ -126,10 +123,9 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
     <span>Total:</span>
     <span id="cartTotal">₱0.00</span>
   </div>
-  <button class="btn btn-primary" onclick="showCheckoutModal()">💰 CHECKOUT</button>
+  <button class="btn btn-primary" onclick="checkout()">💰 CHECKOUT</button>
 </div>
 
-<!-- ADD TO CART MODAL -->
 <div class="modal" id="addCartModal">
   <div class="modal-content">
     <h3 id="modalProductName">Add to Cart</h3>
@@ -142,30 +138,6 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   </div>
 </div>
 
-<!-- CHECKOUT MODAL - BAGO TO BOSS -->
-<div class="modal" id="checkoutModal">
-  <div class="modal-content">
-    <h3>💰 Checkout</h3>
-    <div class="checkout-info">
-      <div class="checkout-row">
-        <span>Total Amount:</span>
-        <span id="checkoutTotal">₱0.00</span>
-      </div>
-    </div>
-    <input type="number" id="cashAmount" placeholder="Cash Received ₱" min="0" oninput="calculateChange()">
-    <div class="checkout-info" id="changeInfo" style="display:none">
-      <div class="checkout-row change">
-        <span>Change:</span>
-        <span id="changeAmount">₱0.00</span>
-      </div>
-    <div class="modal-buttons">
-      <button class="btn-cancel" onclick="closeModal('checkoutModal')">Cancel</button>
-      <button class="btn-confirm" onclick="confirmCheckout()">Confirm Payment</button>
-    </div>
-  </div>
-</div>
-
-<!-- PRODUCTION MODAL -->
 <div class="modal" id="addProductionModal">
   <div class="modal-content">
     <h3 id="modalProdName">Add Production</h3>
@@ -177,7 +149,6 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
   </div>
 </div>
 
-<!-- EXPENSE MODAL -->
 <div class="modal" id="addExpenseModal">
   <div class="modal-content">
     <h3>Add Expense</h3>
@@ -202,38 +173,27 @@ body{font-family:Arial,sans-serif;background:var(--light);padding:10px;padding-b
 
 <script>
 var products = [
-  // 65's
   {id:1,name:'Pork 65\'s',cat:'65\'s',stock:100,price:160},
   {id:2,name:'Chicken 65\'s',cat:'65\'s',stock:100,price:150},
   {id:3,name:'Beef 65\'s',cat:'65\'s',stock:100,price:150},
   {id:4,name:'Japanese 65\'s',cat:'65\'s',stock:100,price:160},
   {id:5,name:'Shrimp 65\'s',cat:'65\'s',stock:100,price:170},
-
-  // 30's
   {id:6,name:'Pork 30\'s',cat:'30\'s',stock:100,price:80},
   {id:7,name:'Chicken 30\'s',cat:'30\'s',stock:100,price:80},
   {id:8,name:'Beef 30\'s',cat:'30\'s',stock:100,price:80},
   {id:9,name:'Japanese 30\'s',cat:'30\'s',stock:100,price:80},
   {id:10,name:'Shrimp 30\'s',cat:'30\'s',stock:100,price:85},
-
-  // BIG SIOMAI
   {id:11,name:'Pork Big Siomai',cat:'BIG SIOMAI',stock:100,price:120},
   {id:12,name:'Chicken Big Siomai',cat:'BIG SIOMAI',stock:100,price:120},
   {id:13,name:'Beef Big Siomai',cat:'BIG SIOMAI',stock:100,price:120},
   {id:14,name:'Japanese Big Siomai',cat:'BIG SIOMAI',stock:100,price:150},
-
-  // DUMPLINGS
   {id:15,name:'Sharksfin',cat:'DUMPLINGS',stock:100,price:110},
   {id:16,name:'Gyoza',cat:'DUMPLINGS',stock:100,price:110},
   {id:17,name:'Hakaw',cat:'DUMPLINGS',stock:100,price:280},
-
-  // SIOPAO
   {id:18,name:'Jumbo Asado',cat:'SIOPAO',stock:100,price:200},
   {id:19,name:'MINI SIOPAO',cat:'SIOPAO',stock:100,price:200},
   {id:20,name:'Mini Bola Bola',cat:'SIOPAO',stock:100,price:209},
   {id:21,name:'Mini ASADO',cat:'SIOPAO',stock:100,price:200},
-
-  // SAUCE
   {id:22,name:'Chili Garlic Sauce',cat:'SAUCE',stock:100,price:15},
   {id:23,name:'Toyomansi',cat:'SAUCE',stock:100,price:10},
   {id:24,name:'Calamansi',cat:'SAUCE',stock:100,price:5},
@@ -250,7 +210,6 @@ var transactions = [];
 var expensesList = [];
 var currentCartId = 0;
 var currentProdId = 0;
-var currentCheckoutTotal = 0;
 
 function saveData(){
   localStorage.setItem('products',JSON.stringify(products));
@@ -415,45 +374,12 @@ function clearCart(){
   renderCart();
 }
 
-// BAGO SA V3.17: CASH & CHANGE
-function showCheckoutModal(){
+function checkout(){
   if(cart.length===0){alert('Cart is empty!');return}
 
   var total = 0;
-  for(var i=0;i<cart.length;i++){
-    total += cart[i].price * cart[i].qty;
-  }
-
-  currentCheckoutTotal = total;
-  document.getElementById('checkoutTotal').textContent = '₱'+total.toFixed(2);
-  document.getElementById('cashAmount').value = '';
-  document.getElementById('changeInfo').style.display = 'none';
-  document.getElementById('checkoutModal').classList.add('active');
-}
-
-function calculateChange(){
-  var cash = parseFloat(document.getElementById('cashAmount').value)||0;
-  if(cash >= currentCheckoutTotal){
-    var change = cash - currentCheckoutTotal;
-    document.getElementById('changeAmount').textContent = '₱'+change.toFixed(2);
-    document.getElementById('changeInfo').style.display = 'block';
-  }else{
-    document.getElementById('changeInfo').style.display = 'none';
-  }
-}
-
-function confirmCheckout(){
-  var cash = parseFloat(document.getElementById('cashAmount').value)||0;
-
-  if(cash < currentCheckoutTotal){
-    alert('Insufficient cash! Need ₱'+currentCheckoutTotal.toFixed(2));
-    return;
-  }
-
-  var change = cash - currentCheckoutTotal;
   var totalItems = 0;
 
-  // Check stock ulit bago bawas
   for(var i=0;i<cart.length;i++){
     var item = cart[i];
     var p = products.find(x=>x.id===item.id);
@@ -461,26 +387,26 @@ function confirmCheckout(){
       alert('Not enough stock for '+p.name+'! Only '+p.stock+' pcs available');
       return;
     }
+    total += item.price * item.qty;
     totalItems += item.qty;
   }
 
-  // Bawas stock
+  if(!confirm('Checkout ₱'+total.toFixed(2)+'?'))return;
+
   for(var i=0;i<cart.length;i++){
     var item = cart[i];
     var p = products.find(x=>x.id===item.id);
     p.stock -= item.qty;
   }
 
-  sales += currentCheckoutTotal;
+  sales += total;
   itemsSold += totalItems;
 
   transactions.unshift({
     id:Date.now(),
     time:new Date().toLocaleTimeString(),
     items:JSON.parse(JSON.stringify(cart)),
-    total:currentCheckoutTotal,
-    cash:cash,
-    change:change
+    total:total
   });
 
   cart = [];
@@ -492,8 +418,7 @@ function confirmCheckout(){
   renderTransactions();
   updateSummary();
 
-  closeModal('checkoutModal');
-  alert('Payment successful!\nTotal: ₱'+currentCheckoutTotal.toFixed(2)+'\nCash: ₱'+cash.toFixed(2)+'\nChange: ₱'+change.toFixed(2));
+  alert('Checkout successful! ₱'+total.toFixed(2)+' | Stock updated');
 }
 
 function addExpense(){
@@ -546,4 +471,31 @@ function renderProductionLogs(){
   }else{
     for(var i=0;i<productionLogs.length;i++){
       var log = productionLogs[i];
-      html += '<div class="log-item"><div><strong>'+log.name+'</strong> +'+log.qty+' pcs</
+      html += '<div class="log-item"><div><strong>'+log.name+'</strong> +'+log.qty+' pcs</div><div class="log-time">'+log.time+'</div></div>';
+    }
+  }
+  document.getElementById('productionLogs').innerHTML = html;
+}
+
+function renderTransactions(){
+  var html = '';
+  if(transactions.length===0){
+    html = '<div class="empty">No transactions yet</div>';
+  }else{
+    for(var i=0;i<transactions.length;i++){
+      var trans = transactions[i];
+      var items = '';
+      for(var j=0;j<trans.items.length;j++){
+        items += trans.items[j].name+' x'+trans.items[j].qty+', ';
+      }
+      html += '<div class="trans-item"><div><strong>₱'+trans.total.toFixed(2)+'</strong></div><div style="font-size:12px;margin:5px 0">'+items.slice(0,-2)+'</div><div class="trans-time">'+trans.time+'</div></div>';
+    }
+  }
+  document.getElementById('transactionsList').innerHTML = html;
+  document.getElementById('transactions').textContent = transactions.length;
+}
+
+function updateSummary(){
+  document.getElementById('sales').textContent = '₱'+sales.toFixed(2);
+  document.getElementById('expenses').textContent = '₱'+expenses.toFixed(2);
+  document.getElement
