@@ -405,47 +405,85 @@ function checkout(){
   var total = 0;
   var totalItems = 0;
 
+  // Stock check
   for(var i=0;i<cart.length;i++){
     var item = cart[i];
     var p = products.find(x=>x.id===item.id);
     if(item.qty > p.stock){
-      alert('Not enough stock for '+p.name+'! Only '+p.stock+' pcs available');
+      alert('Not enough stock for ' + p.name + '!\nAvailable: ' + p.stock);
       return;
     }
     total += item.price * item.qty;
     totalItems += item.qty;
   }
 
-  if(!confirm('Checkout ₱'+total.toFixed(2)+'?'))return;
+  var customerName = document.getElementById('customerName').value || 'Walk-in';
+  var cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
 
+  if(cashAmount < total){
+    alert('Insufficient cash! Kulang ₱' + (total - cashAmount).toFixed(2));
+    return;
+  }
+
+  var change = cashAmount - total;
+
+  // Confirm checkout with change
+  if(!confirm('Customer: ' + customerName + '\nTotal: ₱' + total.toFixed(2) + '\nCash: ₱' + cashAmount.toFixed(2) + '\nChange: ₱' + change.toFixed(2) + '\n\nProceed?')){
+    return;
+  }
+
+  // Deduct stock
   for(var i=0;i<cart.length;i++){
     var item = cart[i];
     var p = products.find(x=>x.id===item.id);
     p.stock -= item.qty;
   }
 
+  // Update sales data
   sales += total;
   itemsSold += totalItems;
 
+  // Save transaction with customer + cash details
   transactions.unshift({
-    id:Date.now(),
-    time:new Date().toLocaleTimeString(),
-    items:JSON.parse(JSON.stringify(cart)),
-    total:total
+    id: Date.now(),
+    time: new Date().toLocaleString(),
+    customer: customerName,
+    items: JSON.parse(JSON.stringify(cart)),
+    total: total,
+    cash: cashAmount,
+    change: change
   });
 
-  cart = [];
-  saveData();
+  var receipt = '=== DHAN SIOMAI POS ===\n';
+  receipt += 'Customer: ' + customerName + '\n';
+  receipt += 'Date: ' + new Date().toLocaleString() + '\n';
+  receipt += '------------------------\n';
 
-  renderCategories();
-  renderPOSCategories();
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    receipt += item.name + ' x' + item.qty + ' = ₱' + (item.price * item.qty).toFixed(2) + '\n';
+  }
+
+  receipt += '------------------------\n';
+  receipt += 'Total Items: ' + totalItems + '\n';
+  receipt += 'TOTAL: ₱' + total.toFixed(2) + '\n';
+  receipt += 'CASH: ₱' + cashAmount.toFixed(2) + '\n';
+  receipt += 'CHANGE: ₱' + change.toFixed(2) + '\n';
+  receipt += '========================\n';
+  receipt += 'Thank you! Come again!';
+
+  alert(receipt);
+
+  // Clear after checkout
+  cart = [];
+  document.getElementById('customerName').value = '';
+  document.getElementById('cashAmount').value = '';
   renderCart();
+  renderProducts();
   renderTransactions();
   updateSummary();
-
-  alert('Checkout successful! ₱'+total.toFixed(2)+' | Stock updated');
+  saveData();
 }
-
 function addExpense(){
   document.getElementById('expAmount').value = '';
   document.getElementById('expNote').value = '';
