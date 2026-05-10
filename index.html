@@ -398,6 +398,7 @@ function clearCart(){
   cart = [];
   renderCart();
 }
+
 function checkout(){
   if(cart.length===0){alert('Cart is empty!');return}
 
@@ -453,6 +454,36 @@ function checkout(){
     change: change
   });
 
+  var receipt = '=== DHAN SIOMAI POS ===\n';
+  receipt += 'Customer: ' + customerName + '\n';
+  receipt += 'Date: ' + new Date().toLocaleString() + '\n';
+  receipt += '------------------------\n';
+
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    receipt += item.name + ' x' + item.qty + ' = ₱' + (item.price * item.qty).toFixed(2) + '\n';
+  }
+
+  receipt += '------------------------\n';
+  receipt += 'Total Items: ' + totalItems + '\n';
+  receipt += 'TOTAL: ₱' + total.toFixed(2) + '\n';
+  receipt += 'CASH: ₱' + cashAmount.toFixed(2) + '\n';
+  receipt += 'CHANGE: ₱' + change.toFixed(2) + '\n';
+  receipt += '========================\n';
+  receipt += 'Thank you! Come again!';
+
+  alert(receipt);
+
+  // Clear after checkout
+  cart = [];
+  document.getElementById('customerName').value = '';
+  document.getElementById('cashAmount').value = '';
+  renderCart();
+  renderProducts();
+  renderTransactions();
+  updateSummary();
+  saveData();
+  }
   var receipt = '=== DHAN SIOMAI POS ===\n';
   receipt += 'Customer: ' + customerName + '\n';
   receipt += 'Date: ' + new Date().toLocaleString() + '\n';
