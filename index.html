@@ -19,9 +19,11 @@
 .product h4 { font-size: 13px; margin-bottom: 5px; height: 32px; }
 .product.price { color: #ff6b35; font-weight: bold; font-size: 16px; margin: 5px 0; }
 .product.stock { font-size: 11px; color: #666; margin-bottom: 8px; }
-.qty-controls { display: flex; gap: 5px; align-items: center; justify-content: center; margin-top: 8px; }
-.qty-input { width: 45px; padding: 5px; text-align: center; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; font-weight: bold; }
-.add-btn { background: #ff6b35; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; flex: 1; }
+.qty-controls { display: flex; gap: 3px; align-items: center; justify-content: center; margin-top: 8px; }
+.qty-btn { background: #ddd; color: #333; border: none; width: 28px; height: 28px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
+.qty-btn:active { background: #ccc; }
+.qty-input { width: 40px; padding: 5px; text-align: center; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; font-weight: bold; }
+.add-btn { background: #ff6b35; color: white; border: none; padding: 6px 8px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 11px; flex: 1; }
 .add-btn:active { background: #e55a2b; }
 .cart-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
 .cart-section h2 { font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #ff6b35; padding-bottom: 5px; }
@@ -80,38 +82,26 @@
   </div>
 
 <script>
-// PRODUCTS MO BOSS - PALITAN MO PRICE AT STOCK!
 var products = [
-  // 65's Category
   {id: 1, name: 'Pork Siomai 65', price: 65, stock: 50, category: "65's"},
   {id: 2, name: 'Chicken Siomai 65', price: 65, stock: 50, category: "65's"},
   {id: 3, name: 'Beef Siomai 65', price: 65, stock: 50, category: "65's"},
   {id: 4, name: 'Shrimp Siomai 65', price: 65, stock: 50, category: "65's"},
-
-  // 30's Category
   {id: 5, name: 'Pork Siomai 30', price: 30, stock: 100, category: "30's"},
   {id: 6, name: 'Chicken Siomai 30', price: 30, stock: 100, category: "30's"},
   {id: 7, name: 'Beef Siomai 30', price: 30, stock: 100, category: "30's"},
   {id: 8, name: 'Shrimp Siomai 30', price: 30, stock: 100, category: "30's"},
   {id: 9, name: 'Japanese Siomai 30', price: 30, stock: 100, category: "30's"},
-
-  // BIG SIOMAI Category
   {id: 10, name: 'Big Pork Siomai', price: 45, stock: 40, category: "BIG SIOMAI"},
   {id: 11, name: 'Big Chicken Siomai', price: 45, stock: 40, category: "BIG SIOMAI"},
   {id: 12, name: 'Big Beef Siomai', price: 45, stock: 40, category: "BIG SIOMAI"},
   {id: 13, name: 'Big Japanese Siomai', price: 45, stock: 40, category: "BIG SIOMAI"},
-
-  // Dumplings Category
   {id: 14, name: 'Gyoza Dumplings', price: 50, stock: 30, category: "Dumplings"},
   {id: 15, name: 'Sharksfin Dumplings', price: 55, stock: 30, category: "Dumplings"},
-
-  // Siopao Category
   {id: 16, name: 'Jumbo Asado Siopao', price: 40, stock: 25, category: "Siopao"},
   {id: 17, name: 'Jumbo Bola-Bola Siopao', price: 40, stock: 25, category: "Siopao"},
   {id: 18, name: 'Mini Asado Siopao', price: 25, stock: 50, category: "Siopao"},
   {id: 19, name: 'Mini Bola-Bola Siopao', price: 25, stock: 50, category: "Siopao"},
-
-  // Sauce Category
   {id: 20, name: 'Chili Garlic Sauce', price: 10, stock: 50, category: "Sauce"},
   {id: 21, name: 'Siopao Sauce', price: 5, stock: 100, category: "Sauce"}
 ];
@@ -147,40 +137,63 @@ function backToCategories(){
   document.getElementById('productsView').classList.add('hidden');
 }
 
+function getAvailableStock(id){
+  var p = products.find(x=>x.id===id);
+  var inCart = cart.find(x=>x.id===id);
+  return p.stock - (inCart? inCart.qty : 0);
+}
+
 function renderProducts(category){
   var catProducts = products.filter(p => p.category === category);
   var html = '';
   for(var i=0;i<catProducts.length;i++){
     var p = catProducts[i];
+    var availStock = getAvailableStock(p.id);
     html += '<div class="product">';
     html += '<h4>' + p.name + '</h4>';
     html += '<div class="price">₱' + p.price + '</div>';
-    html += '<div class="stock">Stock: ' + p.stock + '</div>';
+    html += '<div class="stock" id="stock' + p.id + '">Stock: ' + availStock + '</div>';
     html += '<div class="qty-controls">';
-    html += '<input type="number" class="qty-input" id="qty' + p.id + '" value="1" min="1" max="' + p.stock + '">';
+    html += '<button class="qty-btn" onclick="changeQty(' + p.id + ', -1)">-</button>';
+    html += '<input type="number" class="qty-input" id="qty' + p.id + '" value="1" min="1" max="' + availStock + '">';
+    html += '<button class="qty-btn" onclick="changeQty(' + p.id + ', 1)">+</button>';
     html += '<button class="add-btn" onclick="addToCart(' + p.id + ')">+ ADD</button>';
     html += '</div></div>';
   }
   document.getElementById('productsList').innerHTML = html;
 }
 
+function changeQty(id, delta){
+  var qtyInput = document.getElementById('qty' + id);
+  var availStock = getAvailableStock(id);
+  var newVal = parseInt(qtyInput.value) + delta;
+  if(newVal < 1) newVal = 1;
+  if(newVal > availStock) newVal = availStock;
+  qtyInput.value = newVal;
+}
+
 function addToCart(id){
   var p = products.find(x=>x.id===id);
   var qtyInput = document.getElementById('qty' + id);
   var qty = parseInt(qtyInput.value) || 1;
+  var availStock = getAvailableStock(id);
 
   if(qty <= 0){alert('Invalid quantity!');return}
-  if(p.stock <= 0){alert('Out of stock!');return}
-  if(qty > p.stock){alert('Not enough stock! Available: ' + p.stock);return}
+  if(availStock <= 0){alert('Out of stock!');return}
+  if(qty > availStock){alert('Not enough stock! Available: ' + availStock);return}
 
   var item = cart.find(x=>x.id===id);
   if(item){
-    if(item.qty + qty > p.stock){alert('Not enough stock! Available: ' + (p.stock - item.qty));return}
     item.qty += qty;
   }else{
     cart.push({id:p.id,name:p.name,price:p.price,qty:qty});
   }
-  qtyInput.value = 1;
+
+  // UPDATE STOCK DISPLAY AGAD BOSS!
+  document.getElementById('stock' + id).textContent = 'Stock: ' + (availStock - qty);
+  document.getElementById('qty' + id).value = 1;
+  document.getElementById('qty' + id).max = availStock - qty;
+
   renderCart();
 }
 
@@ -228,7 +241,7 @@ function checkout(){
   if(!confirm('Customer: ' + customerName + '\nTotal: ₱' + total.toFixed(2) + '\nCash: ₱' + cashAmount.toFixed(2) + '\nChange: ₱' + change.toFixed(2) + '\n\nProceed?')){
     return;
   }
-  // BAWAS SA STOCK BOSS!
+  // PERMANENT BAWAS SA STOCK
   for(var i=0;i<cart.length;i++){
     var item = cart[i];
     var p = products.find(x=>x.id===item.id);
