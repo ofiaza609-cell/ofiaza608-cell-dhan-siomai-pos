@@ -47,11 +47,9 @@
 <body>
   <div class="header">DHAN SIOMAI POS</div>
   <div class="container">
-
     <div id="mainFolder">
       <button class="folder-btn" onclick="openMainFolder()">📁 DHAN - One SIOMAI</button>
     </div>
-
     <div id="categoryView" class="hidden">
       <button class="back-btn" onclick="closeMainFolder()">← Back</button>
       <button class="category-btn" onclick="openCategory('65\'s')">📂 65's</button>
@@ -61,13 +59,11 @@
       <button class="category-btn" onclick="openCategory('Siopao')">📂 Siopao</button>
       <button class="category-btn" onclick="openCategory('Sauce')">📂 Sauce</button>
     </div>
-
     <div id="productsView" class="hidden">
       <button class="back-btn" onclick="backToCategories()">← Back to Categories</button>
       <h3 id="currentCategory" style="color:#ff6b35;margin-bottom:10px;"></h3>
       <div id="productsList" class="products"></div>
     </div>
-
     <div class="cart-section">
       <h2>🛒 Cart</h2>
       <div id="cartItems"><p style="color:#999;text-align:center;">Cart is empty</p></div>
@@ -77,7 +73,6 @@
       <button class="checkout-btn" onclick="checkout()">💰 CHECKOUT</button>
       <button class="print-btn" onclick="printLastReceipt()">🖨️ PRINT LAST RECEIPT</button>
     </div>
-
     <div class="summary">
       <h2>📊 Today's Summary</h2>
       <div class="summary-row"><span>Total Sales:</span><span>₱<span id="totalSales">0.00</span></span></div>
@@ -85,7 +80,6 @@
       <button class="history-btn" onclick="showHistory()">📋 VIEW SALES HISTORY</button>
     </div>
   </div>
-
   <div id="historyModal" class="modal hidden">
     <div class="modal-content">
       <button class="close-modal" onclick="closeHistory()">✖ Close</button>
@@ -93,7 +87,6 @@
       <div id="historyList"></div>
     </div>
   </div>
-
 <script>
 var products = JSON.parse(localStorage.getItem('pos_products')) || [
   {id: 1, name: 'Pork Siomai 65', price: 65, stock: 50, category: "65's"},
@@ -118,14 +111,12 @@ var products = JSON.parse(localStorage.getItem('pos_products')) || [
   {id: 20, name: 'Chili Garlic Sauce', price: 10, stock: 50, category: "Sauce"},
   {id: 21, name: 'Siopao Sauce', price: 5, stock: 100, category: "Sauce"}
 ];
-
 var cart = [];
 var sales = parseFloat(localStorage.getItem('pos_sales')) || 0;
 var itemsSold = parseInt(localStorage.getItem('pos_itemsSold')) || 0;
 var transactions = JSON.parse(localStorage.getItem('pos_transactions')) || [];
 var currentCategoryView = '';
 var lastReceipt = localStorage.getItem('pos_lastReceipt') || '';
-
 function saveData(){
   localStorage.setItem('pos_products', JSON.stringify(products));
   localStorage.setItem('pos_sales', sales);
@@ -133,19 +124,16 @@ function saveData(){
   localStorage.setItem('pos_transactions', JSON.stringify(transactions));
   localStorage.setItem('pos_lastReceipt', lastReceipt);
 }
-
 function openMainFolder(){
   document.getElementById('mainFolder').classList.add('hidden');
   document.getElementById('categoryView').classList.remove('hidden');
   document.getElementById('productsView').classList.add('hidden');
 }
-
 function closeMainFolder(){
   document.getElementById('mainFolder').classList.remove('hidden');
   document.getElementById('categoryView').classList.add('hidden');
   document.getElementById('productsView').classList.add('hidden');
 }
-
 function openCategory(category){
   currentCategoryView = category;
   document.getElementById('categoryView').classList.add('hidden');
@@ -153,23 +141,19 @@ function openCategory(category){
   document.getElementById('currentCategory').textContent = '📂 ' + category;
   renderProducts(category);
 }
-
 function backToCategories(){
   document.getElementById('categoryView').classList.remove('hidden');
   document.getElementById('productsView').classList.add('hidden');
 }
-
 function getAvailableStock(id){
   var p = products.find(x=>x.id===id);
   var inCart = cart.find(x=>x.id===id);
   return p.stock - (inCart? inCart.qty : 0);
 }
-
 function getCartQty(id){
   var item = cart.find(x=>x.id===id);
   return item? item.qty : 0;
 }
-
 function renderProducts(category){
   var catProducts = products.filter(p => p.category === category);
   var html = '';
@@ -189,7 +173,6 @@ function renderProducts(category){
   }
   document.getElementById('productsList').innerHTML = html;
 }
-
 function validateQty(id){
   var input = document.getElementById('qty' + id);
   var availStock = getAvailableStock(id);
@@ -201,13 +184,11 @@ function validateQty(id){
     input.value = 1;
   }
 }
-
 function addToCart(id){
   var p = products.find(x=>x.id===id);
   var qtyInput = document.getElementById('qty' + id);
   var qtyToAdd = parseInt(qtyInput.value) || 1;
   var availStock = getAvailableStock(id);
-
   if(qtyToAdd <= 0){alert('Invalid quantity!');return}
   if(availStock <= 0){alert('Out of stock!');return}
   if(qtyToAdd > availStock){
@@ -215,21 +196,142 @@ function addToCart(id){
     qtyInput.value = availStock;
     return;
   }
-
   var item = cart.find(x=>x.id===id);
   if(item){
     item.qty += qtyToAdd;
   }else{
     cart.push({id:p.id,name:p.name,price:p.price,qty:qtyToAdd});
   }
-
   var newAvailStock = getAvailableStock(id);
   var newCartQty = getCartQty(id);
-
   document.getElementById('stock' + id).textContent = 'Stock: ' + newAvailStock;
   document.getElementById('qty' + id).value = newCartQty || 1;
   document.getElementById('qty' + id).max = newAvailStock;
-
   if(newAvailStock <= 5) document.getElementById('stock' + id).className = 'stock low';
-
-  renderCart
+  renderCart();
+}
+function deleteFromCart(id){
+  cart = cart.filter(x=>x.id!==id);
+  renderCart();
+  if(currentCategoryView) renderProducts(currentCategoryView);
+}
+function renderCart(){
+  var html = '';
+  var total = 0;
+  if(cart.length===0){
+    html = '<p style="color:#999;text-align:center;">Cart is empty</p>';
+  }else{
+    for(var i=0;i<cart.length;i++){
+      var item = cart[i];
+      var subtotal = item.price * item.qty;
+      total += subtotal;
+      html += '<div class="cart-item">';
+      html += '<span>' + item.name + ' x' + item.qty + '</span>';
+      html += '<span>₱' + subtotal.toFixed(2) + '<button class="delete-btn" onclick="deleteFromCart(' + item.id + ')">✖</button></span>';
+      html += '</div>';
+    }
+  }
+  document.getElementById('cartItems').innerHTML = html;
+  document.getElementById('cartTotal').textContent = total.toFixed(2);
+}
+function checkout(){
+  if(cart.length===0){alert('Cart is empty!');return}
+  var total = 0;
+  var totalItems = 0;
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    var p = products.find(x=>x.id===item.id);
+    if(item.qty > p.stock){
+      alert('Not enough stock for ' + p.name + '!\nAvailable: ' + p.stock);
+      return;
+    }
+    total += item.price * item.qty;
+    totalItems += item.qty;
+  }
+  var customerName = document.getElementById('customerName').value || 'Walk-in';
+  var cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
+  if(cashAmount < total){
+    alert('Insufficient cash! Kulang ₱' + (total - cashAmount).toFixed(2));
+    return;
+  }
+  var change = cashAmount - total;
+  if(!confirm('Customer: ' + customerName + '\nTotal: ₱' + total.toFixed(2) + '\nCash: ₱' + cashAmount.toFixed(2) + '\nChange: ₱' + change.toFixed(2) + '\n\nProceed?')){
+    return;
+  }
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    var p = products.find(x=>x.id===item.id);
+    p.stock -= item.qty;
+  }
+  sales += total;
+  itemsSold += totalItems;
+  transactions.unshift({
+    id: Date.now(),
+    time: new Date().toLocaleString(),
+    customer: customerName,
+    items: JSON.parse(JSON.stringify(cart)),
+    total: total,
+    cash: cashAmount,
+    change: change
+  });
+  var receipt = '=== DHAN SIOMAI POS ===\n';
+  receipt += 'Customer: ' + customerName + '\n';
+  receipt += 'Date: ' + new Date().toLocaleString() + '\n';
+  receipt += '------------------------\n';
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    receipt += item.name + ' x' + item.qty + ' = ₱' + (item.price * item.qty).toFixed(2) + '\n';
+  }
+  receipt += '------------------------\n';
+  receipt += 'Total Items: ' + totalItems + '\n';
+  receipt += 'TOTAL: ₱' + total.toFixed(2) + '\n';
+  receipt += 'CASH: ₱' + cashAmount.toFixed(2) + '\n';
+  receipt += 'CHANGE: ₱' + change.toFixed(2) + '\n';
+  receipt += '========================\n';
+  receipt += 'Thank you! Come again!';
+  lastReceipt = receipt;
+  alert(receipt);
+  cart = [];
+  document.getElementById('customerName').value = '';
+  document.getElementById('cashAmount').value = '';
+  renderCart();
+  if(currentCategoryView) renderProducts(currentCategoryView);
+  updateSummary();
+  saveData();
+}
+function printLastReceipt(){
+  if(!lastReceipt){alert('No receipt to print!');return}
+  var printWindow = window.open('', '', 'height=600,width=400');
+  printWindow.document.write('<pre style="font-family:monospace;font-size:12px;">' + lastReceipt + '</pre>');
+  printWindow.document.close();
+  printWindow.print();
+}
+function updateSummary(){
+  document.getElementById('totalSales').textContent = sales.toFixed(2);
+  document.getElementById('itemsSold').textContent = itemsSold;
+}
+function showHistory(){
+  var html = '';
+  if(transactions.length === 0){
+    html = '<p style="color:#999;text-align:center;">No transactions yet</p>';
+  }else{
+    for(var i=0;i<transactions.length;i++){
+      var t = transactions[i];
+      html += '<div class="history-item">';
+      html += '<div class="history-time">' + t.time + '</div>';
+      html += '<strong>' + t.customer + '</strong> - ₱' + t.total.toFixed(2) + '<br>';
+      html += 'Items: ' + t.items.map(x=>x.name+' x'+x.qty).join(', ');
+      html += '</div>';
+    }
+  }
+  document.getElementById('historyList').innerHTML = html;
+  document.getElementById('historyModal').classList.remove('hidden');
+}
+function closeHistory(){
+  document.getElementById('historyModal').classList.add('hidden');
+}
+renderCart();
+updateSummary();
+</script>
+</body>
+</html>
