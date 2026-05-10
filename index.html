@@ -7,47 +7,47 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #f5f5f5; }
-   .header { background: #ff6b35; color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
-   .container { padding: 10px; max-width: 600px; margin: 0 auto; }
-   .folder-btn { background: #ff6b35; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 20px; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
-   .folder-btn:active { background: #e55a2b; }
-   .category-btn { background: #ffa366; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; margin-bottom: 10px; cursor: pointer; text-align: left; }
-   .category-btn:active { background: #ff8c42; }
-   .back-btn { background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; cursor: pointer; }
-   .products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
-   .product { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
-   .product h4 { font-size: 13px; margin-bottom: 5px; height: 32px; }
-   .product.price { color: #ff6b35; font-weight: bold; font-size: 16px; margin: 5px 0; }
-   .product.stock { font-size: 11px; color: #666; margin-bottom: 8px; }
-   .product.stock.low { color: #dc3545; font-weight: bold; }
-   .qty-controls { display: flex; gap: 5px; align-items: center; justify-content: center; margin-top: 8px; }
-   .qty-input { width: 45px; padding: 5px; text-align: center; border: 2px solid #ff6b35; border-radius: 5px; font-size: 14px; font-weight: bold; }
-   .add-btn { background: #ff6b35; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; flex: 1; }
-   .add-btn:active { background: #e55a2b; }
-   .cart-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
-   .cart-section h2 { font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #ff6b35; padding-bottom: 5px; }
+  .header { background: #ff6b35; color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
+  .container { padding: 10px; max-width: 600px; margin: 0 auto; }
+  .folder-btn { background: #ff6b35; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 20px; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
+  .folder-btn:active { background: #e55a2b; }
+  .category-btn { background: #ffa366; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; margin-bottom: 10px; cursor: pointer; text-align: left; }
+  .category-btn:active { background: #ff8c42; }
+  .back-btn { background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; cursor: pointer; }
+  .products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+  .product { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+  .product h4 { font-size: 13px; margin-bottom: 5px; height: 32px; }
+  .product.price { color: #ff6b35; font-weight: bold; font-size: 16px; margin: 5px 0; }
+  .product.stock { font-size: 11px; color: #666; margin-bottom: 8px; }
+  .product.stock.low { color: #dc3545; font-weight: bold; }
+  .qty-controls { display: flex; gap: 5px; align-items: center; justify-content: center; margin-top: 8px; }
+  .qty-input { width: 45px; padding: 5px; text-align: center; border: 2px solid #ff6b35; border-radius: 5px; font-size: 14px; font-weight: bold; }
+  .add-btn { background: #ff6b35; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px; flex: 1; }
+  .add-btn:active { background: #e55a2b; }
+  .cart-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+  .cart-section h2 { font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #ff6b35; padding-bottom: 5px; }
     #cartItems { margin-bottom: 10px; }
-   .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
-   .delete-btn { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px; }
-   .cart-total { font-size: 20px; font-weight: bold; text-align: right; margin: 15px 0; }
-   .customer-input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
-   .checkout-btn { background: #28a745; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-   .print-btn { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
-   .summary { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
-   .summary-row { display: flex; justify-content: space-between; margin: 8px 0; }
-   .history-btn { background: #6c757d; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-   .history-item { background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 8px; font-size: 12px; border-left: 3px solid #ff6b35; }
-   .history-time { color: #666; font-size: 11px; }
-   .hidden { display: none!important; }
-   .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-   .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; }
-   .close-modal { background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; float: right; cursor: pointer; }
-   .receipt-text { font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 13px; line-height: 1.5; text-align: center; }
-   .modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
-   .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
-   .btn-confirm { background: #28a745; color: white; }
-   .btn-cancel { background: #6c757d; color: white; }
-   .btn-ok { background: #007bff; color: white; width: 100%; }
+  .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+  .delete-btn { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 8px; }
+  .cart-total { font-size: 20px; font-weight: bold; text-align: right; margin: 15px 0; }
+  .customer-input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+  .checkout-btn { background: #28a745; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+  .print-btn { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+  .summary { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+  .summary-row { display: flex; justify-content: space-between; margin: 8px 0; }
+  .history-btn { background: #6c757d; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+  .history-item { background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 8px; font-size: 12px; border-left: 3px solid #ff6b35; }
+  .history-time { color: #666; font-size: 11px; }
+  .hidden { display: none!important; }
+  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; }
+  .close-modal { background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; float: right; cursor: pointer; }
+  .receipt-text { font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 13px; line-height: 1.5; text-align: center; }
+  .modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
+  .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
+  .btn-confirm { background: #28a745; color: white; }
+  .btn-cancel { background: #6c757d; color: white; }
+  .btn-ok { background: #007bff; color: white; width: 100%; }
   </style>
 </head>
 <body>
@@ -58,8 +58,8 @@
     </div>
     <div id="categoryView" class="hidden">
       <button class="back-btn" onclick="closeMainFolder()">← Back</button>
-      <button class="category-btn" onclick="openCategory('65\'s')">📂 65's</button>
-      <button class="category-btn" onclick="openCategory('30\'s')">📂 30's</button>
+      <button class="category-btn" onclick="openCategory('65')">📂 65's</button>
+      <button class="category-btn" onclick="openCategory('30')">📂 30's</button>
       <button class="category-btn" onclick="openCategory('BIG SIOMAI')">📂 BIG SIOMAI</button>
       <button class="category-btn" onclick="openCategory('Dumplings')">📂 Dumplings</button>
       <button class="category-btn" onclick="openCategory('Siopao')">📂 Siopao</button>
@@ -105,15 +105,15 @@
 
 <script>
 var products = JSON.parse(localStorage.getItem('pos_products')) || [
-  {id: 1, name: 'Pork Siomai 65', price: 65, stock: 50, category: "65's"},
-  {id: 2, name: 'Chicken Siomai 65', price: 65, stock: 50, category: "65's"},
-  {id: 3, name: 'Beef Siomai 65', price: 65, stock: 50, category: "65's"},
-  {id: 4, name: 'Shrimp Siomai 65', price: 65, stock: 50, category: "65's"},
-  {id: 5, name: 'Pork Siomai 30', price: 30, stock: 100, category: "30's"},
-  {id: 6, name: 'Chicken Siomai 30', price: 30, stock: 100, category: "30's"},
-  {id: 7, name: 'Beef Siomai 30', price: 30, stock: 100, category: "30's"},
-  {id: 8, name: 'Shrimp Siomai 30', price: 30, stock: 100, category: "30's"},
-  {id: 9, name: 'Japanese Siomai 30', price: 30, stock: 100, category: "30's"},
+  {id: 1, name: 'Pork Siomai 65', price: 65, stock: 50, category: "65"},
+  {id: 2, name: 'Chicken Siomai 65', price: 65, stock: 50, category: "65"},
+  {id: 3, name: 'Beef Siomai 65', price: 65, stock: 50, category: "65"},
+  {id: 4, name: 'Shrimp Siomai 65', price: 65, stock: 50, category: "65"},
+  {id: 5, name: 'Pork Siomai 30', price: 30, stock: 100, category: "30"},
+  {id: 6, name: 'Chicken Siomai 30', price: 30, stock: 100, category: "30"},
+  {id: 7, name: 'Beef Siomai 30', price: 30, stock: 100, category: "30"},
+  {id: 8, name: 'Shrimp Siomai 30', price: 30, stock: 100, category: "30"},
+  {id: 9, name: 'Japanese Siomai 30', price: 30, stock: 100, category: "30"},
   {id: 10, name: 'Big Pork Siomai', price: 45, stock: 40, category: "BIG SIOMAI"},
   {id: 11, name: 'Big Chicken Siomai', price: 45, stock: 40, category: "BIG SIOMAI"},
   {id: 12, name: 'Big Beef Siomai', price: 45, stock: 40, category: "BIG SIOMAI"},
@@ -176,7 +176,7 @@ function openCategory(category){
   currentCategoryView = category;
   document.getElementById('categoryView').classList.add('hidden');
   document.getElementById('productsView').classList.remove('hidden');
-  document.getElementById('currentCategory').textContent = '📂 ' + category;
+  document.getElementById('currentCategory').textContent = '📂 ' + category + (category=='65'||category=='30'?"'s":"");
   renderProducts(category);
 }
 
@@ -269,3 +269,132 @@ function renderCart(){
   }else{
     for(var i=0;i<cart.length;i++){
       var item = cart[i];
+      var subtotal = item.price * item.qty;
+      total += subtotal;
+      html += '<div class="cart-item">';
+      html += '<span>' + item.name + ' x' + item.qty + '</span>';
+      html += '<span>₱' + subtotal.toFixed(2) + '<button class="delete-btn" onclick="deleteFromCart(' + item.id + ')">✖</button></span>';
+      html += '</div>';
+    }
+  }
+  document.getElementById('cartItems').innerHTML = html;
+  document.getElementById('cartTotal').textContent = total.toFixed(2);
+}
+
+function checkout(){
+  if(cart.length===0){showPopup('Empty Cart', 'Cart is empty!', [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);return}
+  var total = 0;
+  var totalItems = 0;
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    var p = products.find(x=>x.id===item.id);
+    if(item.qty > p.stock){
+      showPopup('Stock Error', 'Not enough stock for ' + p.name + '!\nAvailable: ' + p.stock, [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
+      return;
+    }
+    total += item.price * item.qty;
+    totalItems += item.qty;
+  }
+  var customerName = document.getElementById('customerName').value || 'Walk-in';
+  var cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
+  if(cashAmount < total){
+    showPopup('Insufficient Cash', 'Kulang ₱' + (total - cashAmount).toFixed(2), [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
+    return;
+  }
+  var change = cashAmount - total;
+  var confirmMsg = 'Customer: ' + customerName + '\nTotal: ₱' + total.toFixed(2) + '\nCash: ₱' + cashAmount.toFixed(2) + '\nChange: ₱' + change.toFixed(2);
+  showPopup('Confirm Transaction', confirmMsg, [
+    {text:'Cancel', class:'btn-cancel', onclick:'closePopup()'},
+    {text:'Proceed', class:'btn-confirm', onclick:'processCheckout(' + total + ',' + totalItems + ',"' + customerName.replace(/"/g, '\\"') + '",' + cashAmount + ',' + change + ')'}
+  ]);
+}
+
+function processCheckout(total, totalItems, customerName, cashAmount, change){
+  closePopup();
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    var p = products.find(x=>x.id===item.id);
+    p.stock -= item.qty;
+  }
+  sales += total;
+  itemsSold += totalItems;
+  transactions.unshift({
+    id: Date.now(),
+    time: new Date().toLocaleString(),
+    customer: customerName,
+    items: JSON.parse(JSON.stringify(cart)),
+    total: total,
+    cash: cashAmount,
+    change: change
+  });
+  var receipt = 'DHAN SIOMAI POS\n';
+  receipt += 'Customer: ' + customerName + '\n';
+  receipt += 'Date: ' + new Date().toLocaleString() + '\n';
+  receipt += '------------------------\n';
+  for(var i=0;i<cart.length;i++){
+    var item = cart[i];
+    receipt += item.name + ' x' + item.qty + '\n';
+    receipt += ' ₱' + item.price + ' x ' + item.qty + ' = ₱' + (item.price * item.qty).toFixed(2) + '\n';
+  }
+  receipt += '------------------------\n';
+  receipt += 'Total Items: ' + totalItems + '\n';
+  receipt += 'TOTAL: ₱' + total.toFixed(2) + '\n';
+  receipt += 'CASH: ₱' + cashAmount.toFixed(2) + '\n';
+  receipt += 'CHANGE: ₱' + change.toFixed(2) + '\n';
+  receipt += '========================\n';
+  receipt += 'Thank you! Come again!';
+  lastReceipt = receipt;
+  cart = [];
+  document.getElementById('customerName').value = '';
+  document.getElementById('cashAmount').value = '';
+  renderCart();
+  if(currentCategoryView) renderProducts(currentCategoryView);
+  updateSummary();
+  saveData();
+  setTimeout(function(){
+    showPopup('Transaction Complete', receipt, [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
+  }, 100);
+}
+
+function printLastReceipt(){
+  if(!lastReceipt){showPopup('No Receipt', 'No receipt to print!', [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);return}
+  var printWindow = window.open('', '', 'height=600,width=400');
+  printWindow.document.write('<html><head><title>Receipt</title></head><body>');
+  printWindow.document.write('<pre style="font-family:Courier New,monospace;font-size:12px;text-align:center;margin:20px;">' + lastReceipt + '</pre>');
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+}
+
+function updateSummary(){
+  document.getElementById('totalSales').textContent = sales.toFixed(2);
+  document.getElementById('itemsSold').textContent = itemsSold;
+}
+
+function showHistory(){
+  var html = '';
+  if(transactions.length === 0){
+    html = '<p style="color:#999;text-align:center;">No transactions yet</p>';
+  }else{
+    for(var i=0;i<transactions.length;i++){
+      var t = transactions[i];
+      html += '<div class="history-item">';
+      html += '<div class="history-time">' + t.time + '</div>';
+      html += '<strong>' + t.customer + '</strong> - ₱' + t.total.toFixed(2) + '<br>';
+      html += 'Items: ' + t.items.map(x=>x.name+' x'+x.qty).join(', ');
+      html += '</div>';
+    }
+  }
+  document.getElementById('historyList').innerHTML = html;
+  document.getElementById('historyModal').classList.remove('hidden');
+}
+
+function closeHistory(){
+  document.getElementById('historyModal').classList.add('hidden');
+}
+
+renderCart();
+updateSummary();
+</script>
+</body>
+</html>
