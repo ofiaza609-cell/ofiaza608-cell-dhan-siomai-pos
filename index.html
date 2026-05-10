@@ -39,9 +39,15 @@
 .history-item { background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 8px; font-size: 12px; border-left: 3px solid #ff6b35; }
 .history-time { color: #666; font-size: 11px; }
 .hidden { display: none; }
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
-.modal-content { background: white; margin: 20px; padding: 20px; border-radius: 8px; max-width: 600px; margin: 20px auto; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto; display: flex; align-items: center; justify-content: center; }
+.modal-content { background: white; margin: 20px; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; }
 .close-modal { background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; float: right; cursor: pointer; }
+.receipt-text { font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 14px; line-height: 1.4; }
+.modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
+.modal-btn { flex: 1; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
+.btn-confirm { background: #28a745; color: white; }
+.btn-cancel { background: #6c757d; color: white; }
+.btn-ok { background: #007bff; color: white; width: 100%; }
   </style>
 </head>
 <body>
@@ -80,6 +86,7 @@
       <button class="history-btn" onclick="showHistory()">📋 VIEW SALES HISTORY</button>
     </div>
   </div>
+
   <div id="historyModal" class="modal hidden">
     <div class="modal-content">
       <button class="close-modal" onclick="closeHistory()">✖ Close</button>
@@ -87,6 +94,15 @@
       <div id="historyList"></div>
     </div>
   </div>
+
+  <div id="popupModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="popupTitle" style="color:#ff6b35;margin-bottom:15px;"></h2>
+      <div id="popupMessage" class="receipt-text"></div>
+      <div id="popupButtons" class="modal-buttons"></div>
+    </div>
+  </div>
+
 <script>
 var products = JSON.parse(localStorage.getItem('pos_products')) || [
   {id: 1, name: 'Pork Siomai 65', price: 65, stock: 50, category: "65's"},
@@ -117,6 +133,23 @@ var itemsSold = parseInt(localStorage.getItem('pos_itemsSold')) || 0;
 var transactions = JSON.parse(localStorage.getItem('pos_transactions')) || [];
 var currentCategoryView = '';
 var lastReceipt = localStorage.getItem('pos_lastReceipt') || '';
+
+function showPopup(title, message, buttons){
+  document.getElementById('popupTitle').textContent = title;
+  document.getElementById('popupMessage').textContent = message;
+  var btnHtml = '';
+  for(var i=0;i<buttons.length;i++){
+    var b = buttons[i];
+    btnHtml += '<button class="modal-btn ' + b.class + '" onclick="' + b.onclick + '">' + b.text + '</button>';
+  }
+  document.getElementById('popupButtons').innerHTML = btnHtml;
+  document.getElementById('popupModal').classList.remove('hidden');
+}
+
+function closePopup(){
+  document.getElementById('popupModal').classList.add('hidden');
+}
+
 function saveData(){
   localStorage.setItem('pos_products', JSON.stringify(products));
   localStorage.setItem('pos_sales', sales);
@@ -124,16 +157,19 @@ function saveData(){
   localStorage.setItem('pos_transactions', JSON.stringify(transactions));
   localStorage.setItem('pos_lastReceipt', lastReceipt);
 }
+
 function openMainFolder(){
   document.getElementById('mainFolder').classList.add('hidden');
   document.getElementById('categoryView').classList.remove('hidden');
   document.getElementById('productsView').classList.add('hidden');
 }
+
 function closeMainFolder(){
   document.getElementById('mainFolder').classList.remove('hidden');
   document.getElementById('categoryView').classList.add('hidden');
   document.getElementById('productsView').classList.add('hidden');
 }
+
 function openCategory(category){
   currentCategoryView = category;
   document.getElementById('categoryView').classList.add('hidden');
@@ -141,19 +177,23 @@ function openCategory(category){
   document.getElementById('currentCategory').textContent = '📂 ' + category;
   renderProducts(category);
 }
+
 function backToCategories(){
   document.getElementById('categoryView').classList.remove('hidden');
   document.getElementById('productsView').classList.add('hidden');
 }
+
 function getAvailableStock(id){
   var p = products.find(x=>x.id===id);
   var inCart = cart.find(x=>x.id===id);
   return p.stock - (inCart? inCart.qty : 0);
 }
+
 function getCartQty(id){
   var item = cart.find(x=>x.id===id);
   return item? item.qty : 0;
 }
+
 function renderProducts(category){
   var catProducts = products.filter(p => p.category === category);
   var html = '';
@@ -173,26 +213,28 @@ function renderProducts(category){
   }
   document.getElementById('productsList').innerHTML = html;
 }
+
 function validateQty(id){
   var input = document.getElementById('qty' + id);
   var availStock = getAvailableStock(id);
   if(parseInt(input.value) > availStock){
-    alert('Max stock: ' + availStock);
+    showPopup('Stock Limit', 'Max stock: ' + availStock, [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
     input.value = availStock;
   }
   if(parseInt(input.value) < 1 || isNaN(parseInt(input.value))){
     input.value = 1;
   }
 }
+
 function addToCart(id){
   var p = products.find(x=>x.id===id);
   var qtyInput = document.getElementById('qty' + id);
   var qtyToAdd = parseInt(qtyInput.value) || 1;
   var availStock = getAvailableStock(id);
-  if(qtyToAdd <= 0){alert('Invalid quantity!');return}
-  if(availStock <= 0){alert('Out of stock!');return}
+  if(qtyToAdd <= 0){showPopup('Error', 'Invalid quantity!', [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);return}
+  if(availStock <= 0){showPopup('Out of Stock', 'This item is out of stock!', [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);return}
   if(qtyToAdd > availStock){
-    alert('Not enough stock! Available: ' + availStock);
+    showPopup('Stock Limit', 'Not enough stock! Available: ' + availStock, [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
     qtyInput.value = availStock;
     return;
   }
@@ -210,11 +252,13 @@ function addToCart(id){
   if(newAvailStock <= 5) document.getElementById('stock' + id).className = 'stock low';
   renderCart();
 }
+
 function deleteFromCart(id){
   cart = cart.filter(x=>x.id!==id);
   renderCart();
   if(currentCategoryView) renderProducts(currentCategoryView);
 }
+
 function renderCart(){
   var html = '';
   var total = 0;
@@ -234,15 +278,16 @@ function renderCart(){
   document.getElementById('cartItems').innerHTML = html;
   document.getElementById('cartTotal').textContent = total.toFixed(2);
 }
+
 function checkout(){
-  if(cart.length===0){alert('Cart is empty!');return}
+  if(cart.length===0){showPopup('Empty Cart', 'Cart is empty!', [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);return}
   var total = 0;
   var totalItems = 0;
   for(var i=0;i<cart.length;i++){
     var item = cart[i];
     var p = products.find(x=>x.id===item.id);
     if(item.qty > p.stock){
-      alert('Not enough stock for ' + p.name + '!\nAvailable: ' + p.stock);
+      showPopup('Stock Error', 'Not enough stock for ' + p.name + '!\nAvailable: ' + p.stock, [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
       return;
     }
     total += item.price * item.qty;
@@ -251,13 +296,18 @@ function checkout(){
   var customerName = document.getElementById('customerName').value || 'Walk-in';
   var cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
   if(cashAmount < total){
-    alert('Insufficient cash! Kulang ₱' + (total - cashAmount).toFixed(2));
+    showPopup('Insufficient Cash', 'Kulang ₱' + (total - cashAmount).toFixed(2), [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
     return;
   }
   var change = cashAmount - total;
-  if(!confirm('Customer: ' + customerName + '\nTotal: ₱' + total.toFixed(2) + '\nCash: ₱' + cashAmount.toFixed(2) + '\nChange: ₱' + change.toFixed(2) + '\n\nProceed?')){
-    return;
-  }
+  var confirmMsg = 'Customer: ' + customerName + '\nTotal: ₱' + total.toFixed(2) + '\nCash: ₱' + cashAmount.toFixed(2) + '\nChange: ₱' + change.toFixed(2);
+  showPopup('Confirm Transaction', confirmMsg, [
+    {text:'Cancel', class:'btn-cancel', onclick:'closePopup()'},
+    {text:'Proceed', class:'btn-confirm', onclick:'processCheckout(' + total + ',' + totalItems + ',"' + customerName + '",' + cashAmount + ',' + change + ')'}
+  ]);
+}
+
+function processCheckout(total, totalItems, customerName, cashAmount, change){
   for(var i=0;i<cart.length;i++){
     var item = cart[i];
     var p = products.find(x=>x.id===item.id);
@@ -274,7 +324,7 @@ function checkout(){
     cash: cashAmount,
     change: change
   });
-  var receipt = '=== DHAN SIOMAI POS ===\n';
+  var receipt = 'DHAN SIOMAI POS\n';
   receipt += 'Customer: ' + customerName + '\n';
   receipt += 'Date: ' + new Date().toLocaleString() + '\n';
   receipt += '------------------------\n';
@@ -290,7 +340,6 @@ function checkout(){
   receipt += '========================\n';
   receipt += 'Thank you! Come again!';
   lastReceipt = receipt;
-  alert(receipt);
   cart = [];
   document.getElementById('customerName').value = '';
   document.getElementById('cashAmount').value = '';
@@ -298,18 +347,22 @@ function checkout(){
   if(currentCategoryView) renderProducts(currentCategoryView);
   updateSummary();
   saveData();
+  showPopup('Transaction Complete', receipt, [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);
 }
+
 function printLastReceipt(){
-  if(!lastReceipt){alert('No receipt to print!');return}
+  if(!lastReceipt){showPopup('No Receipt', 'No receipt to print!', [{text:'OK', class:'btn-ok', onclick:'closePopup()'}]);return}
   var printWindow = window.open('', '', 'height=600,width=400');
-  printWindow.document.write('<pre style="font-family:monospace;font-size:12px;">' + lastReceipt + '</pre>');
+  printWindow.document.write('<pre style="font-family:Courier New,monospace;font-size:12px;text-align:center;">' + lastReceipt + '</pre>');
   printWindow.document.close();
   printWindow.print();
 }
+
 function updateSummary(){
   document.getElementById('totalSales').textContent = sales.toFixed(2);
   document.getElementById('itemsSold').textContent = itemsSold;
 }
+
 function showHistory(){
   var html = '';
   if(transactions.length === 0){
@@ -327,9 +380,11 @@ function showHistory(){
   document.getElementById('historyList').innerHTML = html;
   document.getElementById('historyModal').classList.remove('hidden');
 }
+
 function closeHistory(){
   document.getElementById('historyModal').classList.add('hidden');
 }
+
 renderCart();
 updateSummary();
 </script>
