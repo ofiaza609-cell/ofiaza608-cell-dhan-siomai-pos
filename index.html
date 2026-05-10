@@ -79,7 +79,8 @@
 <body>
   <div class="header">
     <span>DHAN SIOMAI POS</span>
-    <button class="admin-toggle" onclick="toggleAdmin()">⚙️ <span id="adminStatus">ADMIN OFF</span></button>
+  <button class="admin-toggle" onclick="toggleAdmin()">⚙️ <span id="adminStatus">ADMIN OFF</span></button>
+<button class="admin-toggle hidden" id="resetBtn" onclick="resetAllData()" style="background:#dc3545;margin-left:5px;">🗑️ RESET</button>
   </div>
 
   <div id="installBanner" class="install-banner hidden" onclick="installApp()">
@@ -207,11 +208,29 @@ function installApp(){
 }
 
 function toggleAdmin(){
-  adminMode =!adminMode;
+  adminMode = !adminMode;
   document.getElementById('adminStatus').textContent = adminMode? 'ADMIN ON' : 'ADMIN OFF';
   document.getElementById('adminStatus').parentElement.style.background = adminMode? '#dc3545' : '#fff';
   document.getElementById('adminStatus').parentElement.style.color = adminMode? '#fff' : '#ff6b35';
+  document.getElementById('resetBtn').classList.toggle('hidden', !adminMode);
   if(currentCategoryView) renderProducts(currentCategoryView);
+}
+ function resetAllData(){
+  if(confirm('SURE KA BOSS?\n\nBuburahin lahat ng:\n- Total Sales\n- Items Sold\n- Sales History\n\nDi na maibabalik!')){
+    localStorage.removeItem('pos_sales');
+    localStorage.removeItem('pos_itemsSold');
+    localStorage.removeItem('pos_transactions');
+    localStorage.removeItem('pos_lastReceipt');
+    
+    sales = 0;
+    itemsSold = 0;
+    transactions = [];
+    lastReceipt = '';
+    
+    updateSummary();
+    showPopup('Reset Done ✅', 'Balik zero na lahat boss!', false);
+    closeHistory();
+  }
 }
 
 function showPopup(title, message, showConfirm){
