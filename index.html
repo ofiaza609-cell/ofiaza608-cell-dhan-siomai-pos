@@ -7,44 +7,56 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #f5f5f5; }
- .header { background: #ff6b35; color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; }
- .container { padding: 10px; max-width: 600px; margin: 0 auto; }
- .folder-btn { background: #ff6b35; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 20px; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
- .folder-btn:active { background: #e55a2b; }
- .back-btn { background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; cursor: pointer; }
- .category { background: #fff3e0; padding: 10px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #ff6b35; }
- .category h3 { color: #ff6b35; font-size: 18px; margin-bottom: 10px; }
- .products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
- .product { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
- .product h4 { font-size: 14px; margin-bottom: 5px; }
- .product.price { color: #ff6b35; font-weight: bold; font-size: 16px; margin: 5px 0; }
- .product.stock { font-size: 11px; color: #666; }
- .product button { background: #ff6b35; color: white; border: none; padding: 6px 12px; border-radius: 5px; margin-top: 5px; font-weight: bold; cursor: pointer; font-size: 12px; }
- .cart-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
- .cart-section h2 { font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #ff6b35; padding-bottom: 5px; }
+.header { background: #ff6b35; color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; }
+.container { padding: 10px; max-width: 600px; margin: 0 auto; }
+.folder-btn { background: #ff6b35; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 20px; font-weight: bold; margin-bottom: 15px; cursor: pointer; }
+.folder-btn:active { background: #e55a2b; }
+.category-btn { background: #ffa366; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; margin-bottom: 10px; cursor: pointer; text-align: left; }
+.category-btn:active { background: #ff8c42; }
+.back-btn { background: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; cursor: pointer; }
+.products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+.product { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+.product h4 { font-size: 14px; margin-bottom: 5px; }
+.product.price { color: #ff6b35; font-weight: bold; font-size: 16px; margin: 5px 0; }
+.product.stock { font-size: 11px; color: #666; }
+.product button { background: #ff6b35; color: white; border: none; padding: 6px 12px; border-radius: 5px; margin-top: 5px; font-weight: bold; cursor: pointer; font-size: 12px; }
+.cart-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+.cart-section h2 { font-size: 18px; margin-bottom: 10px; border-bottom: 2px solid #ff6b35; padding-bottom: 5px; }
     #cartItems { margin-bottom: 10px; }
- .cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
- .cart-total { font-size: 20px; font-weight: bold; text-align: right; margin: 15px 0; }
- .customer-input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
- .checkout-btn { background: #28a745; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; }
- .summary { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
- .summary-row { display: flex; justify-content: space-between; margin: 8px 0; }
- .hidden { display: none; }
+.cart-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+.cart-total { font-size: 20px; font-weight: bold; text-align: right; margin: 15px 0; }
+.customer-input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+.checkout-btn { background: #28a745; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; }
+.summary { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+.summary-row { display: flex; justify-content: space-between; margin: 8px 0; }
+.hidden { display: none; }
   </style>
 </head>
 <body>
   <div class="header">DHAN SIOMAI POS</div>
   <div class="container">
 
-    <!-- FOLDER BUTTON -->
-    <div id="folderView">
-      <button class="folder-btn" onclick="openFolder()">📁 DHAN - One SIOMAI</button>
+    <!-- MAIN FOLDER -->
+    <div id="mainFolder">
+      <button class="folder-btn" onclick="openMainFolder()">📁 DHAN - One SIOMAI</button>
     </div>
 
-    <!-- PRODUCTS WITH CATEGORIES -->
+    <!-- CATEGORY FOLDERS -->
+    <div id="categoryView" class="hidden">
+      <button class="back-btn" onclick="closeMainFolder()">← Back</button>
+      <button class="category-btn" onclick="openCategory('65\'s')">📂 65's</button>
+      <button class="category-btn" onclick="openCategory('30\'s')">📂 30's</button>
+      <button class="category-btn" onclick="openCategory('BIG SIOMAI')">📂 BIG SIOMAI</button>
+      <button class="category-btn" onclick="openCategory('Dumplings')">📂 Dumplings</button>
+      <button class="category-btn" onclick="openCategory('Siopao')">📂 Siopao</button>
+      <button class="category-btn" onclick="openCategory('Sauce')">📂 Sauce</button>
+    </div>
+
+    <!-- PRODUCTS INSIDE CATEGORY -->
     <div id="productsView" class="hidden">
-      <button class="back-btn" onclick="closeFolder()">← Back</button>
-      <div id="productsList"></div>
+      <button class="back-btn" onclick="backToCategories()">← Back to Categories</button>
+      <h3 id="currentCategory" style="color:#ff6b35;margin-bottom:10px;"></h3>
+      <div id="productsList" class="products"></div>
     </div>
 
     <!-- CART -->
@@ -65,7 +77,7 @@
   </div>
 
 <script>
-// BOSS ETO NA PRODUCTS MO - PALITAN MO PRICE AT STOCK KUNG IBA!
+// BOSS ETO NA PRODUCTS MO - PALITAN MO PRICE AT STOCK!
 var products = [
   // 65's Category
   {id: 1, name: 'Pork Siomai 65', price: 65, stock: 50, category: "65's"},
@@ -105,38 +117,44 @@ var cart = [];
 var sales = 0;
 var itemsSold = 0;
 var transactions = [];
+var currentCategoryView = '';
 
-function openFolder(){
-  document.getElementById('folderView').classList.add('hidden');
-  document.getElementById('productsView').classList.remove('hidden');
-  renderProducts();
-}
-
-function closeFolder(){
-  document.getElementById('folderView').classList.remove('hidden');
+function openMainFolder(){
+  document.getElementById('mainFolder').classList.add('hidden');
+  document.getElementById('categoryView').classList.remove('hidden');
   document.getElementById('productsView').classList.add('hidden');
 }
 
-function renderProducts(){
-  var categories = ["65's", "30's", "BIG SIOMAI", "Dumplings", "Siopao", "Sauce"];
-  var html = '';
+function closeMainFolder(){
+  document.getElementById('mainFolder').classList.remove('hidden');
+  document.getElementById('categoryView').classList.add('hidden');
+  document.getElementById('productsView').classList.add('hidden');
+}
 
-  for(var c=0;c<categories.length;c++){
-    var cat = categories[c];
-    var catProducts = products.filter(p => p.category === cat);
-    if(catProducts.length > 0){
-      html += '<div class="category"><h3>' + cat + '</h3><div class="products">';
-      for(var i=0;i<catProducts.length;i++){
-        var p = catProducts[i];
-        html += '<div class="product">';
-        html += '<h4>' + p.name + '</h4>';
-        html += '<div class="price">₱' + p.price + '</div>';
-        html += '<div class="stock">Stock: ' + p.stock + '</div>';
-        html += '<button onclick="addToCart(' + p.id + ')">+ ADD</button>';
-        html += '</div>';
-      }
-      html += '</div></div>';
-    }
+function openCategory(category){
+  currentCategoryView = category;
+  document.getElementById('categoryView').classList.add('hidden');
+  document.getElementById('productsView').classList.remove('hidden');
+  document.getElementById('currentCategory').textContent = '📂 ' + category;
+  renderProducts(category);
+}
+
+function backToCategories(){
+  document.getElementById('categoryView').classList.remove('hidden');
+  document.getElementById('productsView').classList.add('hidden');
+}
+
+function renderProducts(category){
+  var catProducts = products.filter(p => p.category === category);
+  var html = '';
+  for(var i=0;i<catProducts.length;i++){
+    var p = catProducts[i];
+    html += '<div class="product">';
+    html += '<h4>' + p.name + '</h4>';
+    html += '<div class="price">₱' + p.price + '</div>';
+    html += '<div class="stock">Stock: ' + p.stock + '</div>';
+    html += '<button onclick="addToCart(' + p.id + ')">+ ADD</button>';
+    html += '</div>';
   }
   document.getElementById('productsList').innerHTML = html;
 }
@@ -234,7 +252,7 @@ function checkout(){
   document.getElementById('customerName').value = '';
   document.getElementById('cashAmount').value = '';
   renderCart();
-  renderProducts();
+  if(currentCategoryView) renderProducts(currentCategoryView);
   updateSummary();
 }
 
